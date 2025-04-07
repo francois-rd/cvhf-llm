@@ -1,0 +1,11 @@
+primary_regex: ^(Answer\s*(to))?\s*Question\s*(.+?)\s*(Ite(ra|ar)tion.+?)?\.\.
+question_group: 3
+answer_to_group: 1
+question_id_regex: '[0-9]+\s*\w?\s*[0-9]*'
+headers:
+  - "Description of chest-related pain/discomfort/feelings/symptoms"
+  - "Access to Medical Care/Relationship with Family Physician"
+  - "Health Knowledge and Literacy"
+  - "Social Demographic Factors"
+  - "Patient Health Questionnaire: PHQ-2"
+  - "Symptoms at Discharge"

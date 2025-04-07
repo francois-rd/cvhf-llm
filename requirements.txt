@@ -1,0 +1,16 @@
+black~=22.3.0
+coma==1.0.1
+omegaconf==2.1.2
+dacite>=1.8.1
+pandas
+numpy==1.22.4
+statsmodels~=0.13.5
+scikit-learn~=1.0.2
+pyreadstat~=1.2.0
+python-docx           # May be docx or python-docx in the main program imports.
+accelerate>=0.28.0
+bitsandbytes>=0.43.0
+transformers>=4.38.0
+torch~=1.13.1         # May be torch or pytorch in the main program imports.
+langchain~=0.3.7
+scipy~=1.13.1

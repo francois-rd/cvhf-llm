@@ -1,0 +1,3319 @@
+system_prompt_options:
+  - >-
+    You are a helpful medical assistant. Your task is to extract and
+    categorize patient responses from snippets of a transcript between an
+    interviewer and a medical patient.
+  - >-
+    You are a helpful medical assistant. Your task is to extract patient
+    responses from snippets of a transcript between an interviewer and a medical
+    patient and convert to the extraction into a canonical form.
+  - >-
+    You are a helpful medical assistant. Your task is to extract and score patient 
+    responses from snippets of a transcript between an interviewer and a medical 
+    patient.
+instruction_prompt_to_sample_delimiter: "\n\n"
+sample_template: "*Snippet of transcript*\n{transcript}\n\n*Answer*"
+included_clusters:
+  - Q_01
+  - Q_02
+  - Q_04
+  - Q_05
+  - Q_06
+  - Q_07_07a_07b
+  - Q_08
+  - Q_08a
+  - Q_09_tod
+  - Q_09_exertion
+  - Q_09_other
+  - Q_10
+  - Q_10a
+  - Q_11_11a
+  - Q_11b
+  - Q_12
+  - Q_13
+  - Q_14
+  - Q_15
+  - Q_16
+  - Q_16a
+  - Q_16b
+  - Q_16c1
+  - Q_16c2
+  - Q_16d
+  - Q_16e1
+  - Q_16e2
+  - Q_16e3
+  - Q_17
+  - Q_18
+  - Q_19
+  - Q_19a
+  - Q_19b
+  - Q_19c
+  - Q_19d
+  - Q_20
+  - Q_21_htn
+  - Q_21_diabetes
+  - Q_21_salt
+  - Q_21_fluid
+  - Q_21_cholesterol
+  - Q_21_smoking
+  - Q_21_fam_history
+  - Q_21_heart_attack
+  - Q_22
+  - Q_23
+  - Q_24
+  - Q_24a
+  - Q_25
+  - Q_25a
+  - Q_25b
+  - Q_26
+  - Q_26a
+  - Q_27
+  - Q_27a_27b
+  - Q_28
+  - Q_29
+  - Q_30
+  - Q_31
+  - Q_32_feel
+  - Q_32_ready
+  - Q_32_tension
+  - Q_33
+  - Q_34
+  - Q_35
+  - Q_35a
+  - Q_36
+clusters:
+  Q_01:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide a 
+      list of symptoms they are or have recently been experiencing that brought 
+      them into the hospital for this current admission. For each patient, your 
+      task is to extract a list of symptoms from the patient's response. Format 
+      your answer by separating each listed symptom with a comma ",". It is 
+      possible that the patient talks about something other than their symptoms. 
+      In this case, your answer should be a single word: "IRRELEVANT".
+      
+      
+      Output either "IRRELEVANT" or a comma-separated list of symptoms.
+      Do not output anything else.
+    question_ids: [1]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN0001, UHN00251, UHN00351]
+    parser_data: {"enum_options": [IRRELEVANT]}
+  Q_02:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide a 
+      list of symptoms they are or have recently been feeling or experiencing in 
+      the events leading up to coming to the hospital for this current admission. 
+      For each patient, your task is to extract a list of symptoms from the patient's
+      response. Format your answer by separating each listed symptom  with a comma
+      ",". It is possible that the patient talks about something other than their
+      symptoms. In this case, your answer should be a single word: "IRRELEVANT".
+      
+      
+      Output either "IRRELEVANT" or a comma-separated list of symptoms.
+      Do not output anything else.
+    question_ids: [2]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN00151, UHN00251, UHN00501]
+    parser_data: {"enum_options": [IRRELEVANT]}
+  Q_04:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide a 
+      list of any other unusual symptoms or feelings they are experiencing. For 
+      each patient, your task is to extract a list of symptoms or feelings from 
+      the patient's response. Format your answer by separating each listed item 
+      with a comma ",".
+      
+      
+      NOTE: It is possible that the patient talks about something other than 
+      their symptoms or feelings. In this case, your answer should be a single 
+      word: "IRRELEVANT".
+      
+      
+      NOTE: It is possible that the patient says that they are not experiencing 
+      any other symptoms or feelings. In this case, your answer should be a 
+      single word: "NONE".
+      
+      
+      Output either "IRRELEVANT" or "NONE" or a comma-separated list of 
+      symptoms/feelings. Do not output anything else.
+    question_ids: [4]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN0001, UHN00151, UHN00251]
+    parser_data: {"enum_options": [IRRELEVANT, NONE]}
+  Q_05:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide
+      either an interval of time or a specific date for how long their symptoms 
+      last when the patient experiences them. Format your answer by extracting 
+      either an interval of time or a specific date according to the instructions below.
+      
+      
+      Interval of time:
+      
+      1. For the interval of time, extract a numerical quantity and a unit of 
+      time (choose from: minutes, hours, days, weeks, months, years).
+      For example, "1 month" or "3 years".
+      
+      2. Convert numbers from text to digits. For example, convert the snippet
+      "three days" to "3 days".
+      
+      3. Imprecise descriptions should be approximated as the nearest common 
+      sense numerical value. For example, convert the snippet "about a month" to 
+      "1 month". For example, convert the snippet "a couple days" to "2 days". 
+      For example, convert the snippet "a few weeks" to "3 weeks". For example, 
+      convert the snippet "several years" to "3 years".
+      
+      
+      Specific date:
+      
+      1. For a specific date, extract and convert the date into a YEAR-MONTH-DAY
+      numerical ISO format (YYYY-MM-DD). For example, convert the snippet
+      "May 2nd 2018" to the ISO format "2018-05-02".
+      
+      2. For any specific date that mentions only the month but not a specific year,
+      extract the string name of the month. For example, convert the snippet
+      "this past Feb" to "February".
+      
+      3. For any specific date that mentions only the year but not a specific month,
+      extract the numerical value of the year. For example, convert the snippet
+      "it happened in 2019" to "2019".
+      
+      4. For any specific date that mentions both a month and a year but not a
+      specific day of the month, assume it is the 15th day of the month *unless*
+      the patient gives an approximate day (such as "beginning" which you should
+      approximate as "1"; or "end" which you should approximate as "28"). Extract
+      a numerical date in the ISO format: YYYY-MM-DD. For example, convert the
+      snippet "March 2020" to "2020-03-15". For example, convert the snippet
+      "beginning of July 2019" as "2019-07-01". For example, convert the snippet
+      "end of October 2018" to "2018-10-28".
+      
+      5. These interviews were recorded on {reference_date}. As such, any
+      mention of "last year" should be interpreted relative to {reference_date}.
+      For example, "August of last year" would be the most recent August before
+      {reference_date}.
+      
+      6. Keep in mind that some dates may be written as text instead of numbers.
+      In these cases, convert the text into a numerical date format using the rules
+      above. For example, convert the snippet "September first twenty eighteen"
+      to "2018-09-01".
+      
+      
+      Additional instructions:
+      
+      It is possible that the patient talks about something other than an interval
+      of time or a specific date. In this case, your answer should be a single
+      word: "IRRELEVANT".
+      
+      
+      Answer with either an interval of time or a specific date according to the
+      format instructions above. Or answer with "IRRELEVANT" is no interval of
+      time or specific date is mentioned. Do not output anything else.
+    question_ids: [5]
+    parser_type: INTERVAL_OR_DATE_OR_REJECT
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00251]
+    system_prompt_index: 1
+    parser_data: {"reject": IRRELEVANT}
+  Q_06:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether anything 
+      makes their symptoms feel better or worse. For each patient, your task is to 
+      extract one of the following options based on the most appropriate case.
+
+
+      Options:
+      
+      1. "BETTER: YES"
+      
+      Answer "BETTER: YES" if the patient directly mentions something that makes 
+      their symptoms better.
+
+      
+      2. "BETTER: NO"
+      
+      Answer "BETTER: NO" if the patient directly mentions that nothing makes 
+      their symptoms better.
+
+
+      3. "WORSE: YES"
+      
+      Answer "WORSE: YES" if the patient directly mentions something that makes 
+      their symptoms worse.
+
+
+      4. "WORSE: NO"
+      
+      Answer "WORSE: NO" if the patient directly mentions that nothing makes 
+      their symptoms worse.
+
+
+      5. "UNQUALIFIED: YES"
+      
+      Answer "UNQUALIFIED: YES" only if the patient answers in the affirmative
+      (for example, "yes", "yeah", "for sure", etc.) without qualifying if they
+      are talking about making things better or worse.
+
+
+      6. "UNQUALIFIED: NO"
+      
+      Answer "UNQUALIFIED: NO" only if the patient answers in the negative (for
+      example, "no", "nah", "nothing", " I don't think so", etc.) without
+      qualifying if they are talking about making things better or worse.
+
+
+      7. "UNSURE"
+
+      Answer "UNSURE" if the patient expresses doubt or uncertainty instead of 
+      giving a definitive response.
+
+
+      8. "IRRELEVANT"
+
+      Answer "IRRELEVANT" if the patient talks about something other than 
+      activities that make their symptoms better or worse.
+
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [6]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00251, UHN00401, UHN00501]
+    parser_data:
+      enum_options:
+        - "BETTER: YES"
+        - "BETTER: NO"
+        - "WORSE: YES"
+        - "WORSE: NO"
+        - "UNQUALIFIED: YES"
+        - "UNQUALIFIED: NO"
+        - "UNSURE"
+        - "IRRELEVANT"
+  Q_07_07a_07b:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether their
+      function is impaired and how far they can walk. For each patient, your task 
+      is to extract one of the following options based on the most appropriate case.
+
+      
+      NOTE: The following options are based on the New York Heart Association 
+      (NYHA) Functional Classification for Heart Failure. Select the most 
+      appropriate option based on the given criteria describing each option.
+
+
+      Options:
+
+      1. "NO LIMITATION"
+
+      Answer "NO LIMITATION" if the patient's response most closely aligns with
+      the following criteria:
+      
+      - No limitation of physical activity
+      
+      - Ordinary physical activity does not cause undue fatigue, palpitation, or dyspnea
+
+
+      2. "SLIGHT LIMITATION"
+
+      Answer "SLIGHT LIMITATION" if the patient's response most closely aligns
+      with the following criteria:
+
+      - Slight limitation of physical activity
+
+      - Comfortable at rest
+      
+      - Ordinary physical activity results in fatigue, palpitation, or dyspnea
+
+      
+      3. "MARKED LIMITATION"
+      
+      Answer "MARKED LIMITATION" if the patient's response most closely aligns 
+      with the following criteria:
+      
+      - Marked limitation of physical activity
+      
+      - Comfortable at rest
+      
+      - Less than ordinary activity causes fatigue, palpitation, or dyspnea
+
+      
+      4. "FULL LIMITATION"
+      
+      Answer "FULL LIMITATION" if the patient's response most closely aligns 
+      with the following criteria:
+      
+      - Unable to carry on any physical activity without discomfort
+      
+      - Symptoms of heart failure at rest
+      
+      - If any physical activity is undertaken, discomfort increases
+
+      
+      5. "IRRELEVANT"
+      
+      Answer "IRRELEVANT" if the patient talks about something other than their 
+      functioning in daily activities and how far they can walk.
+
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["7", "7a", "7b"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00251, UHN00451, UHN00501]
+    parser_data:
+      enum_options:
+        - "NO LIMITATION"
+        - "SLIGHT LIMITATION"
+        - "MARKED LIMITATION"
+        - "FULL LIMITATION"
+        - "IRRELEVANT"
+  Q_08:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient when they first 
+      noticed their current symptoms. Format your answer by extracting either an
+      interval of time or a specific date according to the instructions below.
+      
+      
+      Interval of time:
+      
+      1. For the interval of time, extract a numerical quantity and a unit of 
+      time (choose from: minutes, hours, days, weeks, months, years).
+      For example, "1 month" or "3 years".
+      
+      2. Convert numbers from text to digits. For example, convert the snippet
+      "three days" to "3 days".
+      
+      3. Imprecise descriptions should be approximated as the nearest common 
+      sense numerical value. For example, convert the snippet "about a month" to 
+      "1 month". For example, convert the snippet "a couple days" to "2 days". 
+      For example, convert the snippet "a few weeks" to "3 weeks". For example, 
+      convert the snippet "several years" to "3 years".
+      
+      
+      Specific date:
+      
+      1. For a specific date, extract and convert the date into a YEAR-MONTH-DAY
+      numerical ISO format (YYYY-MM-DD). For example, convert the snippet
+      "May 2nd 2018" to the ISO format "2018-05-02".
+      
+      2. For any specific date that mentions only the month but not a specific year,
+      extract the string name of the month. For example, convert the snippet
+      "this past Feb" to "February".
+      
+      3. For any specific date that mentions only the year but not a specific month,
+      extract the numerical value of the year. For example, convert the snippet
+      "it happened in 2019" to "2019".
+      
+      4. For any specific date that mentions both a month and a year but not a
+      specific day of the month, assume it is the 15th day of the month *unless*
+      the patient gives an approximate day (such as "beginning" which you should
+      approximate as "1"; or "end" which you should approximate as "28"). Extract
+      a numerical date in the ISO format: YYYY-MM-DD. For example, convert the
+      snippet "March 2020" to "2020-03-15". For example, convert the snippet
+      "beginning of July 2019" as "2019-07-01". For example, convert the snippet
+      "end of October 2018" to "2018-10-28".
+      
+      5. These interviews were recorded on {reference_date}. As such, any
+      mention of "last year" should be interpreted relative to {reference_date}.
+      For example, "August of last year" would be the most recent August before
+      {reference_date}.
+      
+      6. Keep in mind that some dates may be written as text instead of numbers.
+      In these cases, convert the text into a numerical date format using the rules
+      above. For example, convert the snippet "September first twenty eighteen"
+      to "2018-09-01".
+      
+      
+      Additional instructions:
+      
+      It is possible that the patient talks about something other than an interval
+      of time or a specific date. In this case, your answer should be a single
+      word: "IRRELEVANT".
+      
+      
+      Answer with either an interval of time or a specific date according to the
+      format instructions above. Or answer with "IRRELEVANT" is no interval of
+      time or specific date is mentioned. Do not output anything else.
+    question_ids: [8]
+    parser_type: INTERVAL_OR_DATE_OR_REJECT
+    few_shot_assign_ids: [UHN00051, UHN00101, UHN00201]
+    system_prompt_index: 1
+    parser_data: {"reject": IRRELEVANT}
+  Q_08a:
+    prompt: >-
+      IIn the snippet below, the interviewer is asking each patient to provide a 
+      list of causes that the patient initially thought were the source of their 
+      current symptoms. For each patient, your task is to extract a list of 
+      symptoms or feelings from the patient's response. Format your answer by 
+      separating each listed item with a comma ",".
+      
+      
+      NOTE: It is possible that the patient talks about something other than 
+      their symptoms or feelings. In this case, your answer should be a single 
+      word: "IRRELEVANT".
+      
+      
+      NOTE: It is possible that the patient says that they do not know or do not 
+      remember. In this case, your answer should be a single word: "UNKNOWN".
+      
+      
+      NOTE: Be sure to only list the causes the patient suspected in the past,
+      not what they currently believe.
+      
+      
+      Output either "IRRELEVANT" or "UNKNOWN" or a comma-separated list of 
+      causes of symptoms. Do not output anything else.
+    question_ids: [8a]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00351]
+    parser_data: {"enum_options": [IRRELEVANT, UNKNOWN]}
+  Q_09_tod:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they 
+      have noticed a pattern that makes their symptoms worse. For this task, 
+      focus on mentions of the *time of day*. For each patient, your task is to 
+      extract and categorize the most appropriate time of day answer from the
+      following options.
+
+
+      Options:
+
+      1. Does the patient mention a specific time of day?
+
+      For each mention of a specific time of day, answer with "YES: <when>".
+      Fill in "<when>" with the specific time of day mentioned. For example, 
+      convert the snippet "oh, yes, in the evening" to "YES: evening".
+
+      
+      If the patient mentions multiple specific times of day, list each one on 
+      *a separate line*. For example, convert the snippet 
+      "in the afternoon and also overnight" to:
+      
+      "YES: evening
+      
+      YES: overnight"
+
+
+      2. No specific time of day.
+
+      If the patient does not mention any specific time of day, answer with 
+      "NO". For example, convert the snippet "no, there is no pattern" to "NO".
+
+      
+      NOTE: Some patients may answer by giving a non-specific time, such as 
+      "all the time" or "no special time". Since these are not specific, answer 
+      with "NO". For example, convert the snippet "all the time" to "NO".
+
+      
+      NOTE: Some patients may give an answer that has nothing to do with the 
+      time of day, such as "on exertion". For all of these, since no specific 
+      time of day is mentioned, answer with "NO". For example, convert the 
+      snippet "yes, on exertion, yes" to "NO" since exertion is not a time of day.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember that the
+      "YES: <when>" option is repeatable (once per line), but the "NO" option is not
+      and should only appear once (if appropriate). Do not output anything else.
+    question_ids: ["9", "9a", "9b"]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN00151, UHN00201, UHN00251]
+    parser_data:
+      options:
+        - {tag: "YES", repeatable: true, value_sep: ":"}
+        - {tag: "NO", repeatable: false, value_sep: null}
+  Q_09_exertion:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they 
+      have noticed a pattern that makes their symptoms worse. For this task, 
+      focus on mentions of patterns *on exertion*. For each patient, your task 
+      is to extract and categorize the most appropriate "on exertion" answer 
+      from the following options.
+
+
+      Options:
+
+      1. Does the patient mention "on exertion" or give a specific example of an activity?
+
+      If the patient talks about "on exertion" in the affirmative, answer with "YES". 
+      Similarly, if the patient mentions a specific activity, answer with "YES". For 
+      example, convert the snippet "definitely exertion" to "YES". Similarly, convert 
+      the snippet "when walking" to "YES".
+
+      2. No mention of "on exertion" or of any specific activity.
+
+      If the patient does not talk about "on exertion" in the affirmative, or actively 
+      talks about "on exertion" in the negative, or does not mention any specific 
+      activity, answer with "NO". For example, convert the snippet 
+      "no, not on exertion" to "NO".
+
+      NOTE: Some patients may give an answer that has nothing to do with exertion, 
+      such as mentioning a time of day. For all of these, since no explicit exertion 
+      mentioned, answer with "NO". For example, convert the snippet "yes, in the 
+      afternoon, yes" to "NO" since a time of day has nothing to do with exertion.
+
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["9", "9a", "9b"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00051, UHN00351, UHN00451]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_09_other:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they 
+      have noticed a pattern that makes their symptoms worse. For each patient, 
+      your task is to extract and categorize the most appropriate answer from 
+      the following options.
+
+
+      Options:
+
+      1. Does the patient mention any specific pattern whatsoever?
+
+      Answer "YES: <pattern>" if the patient mentions at least one specific 
+      pattern they have observed, whether that pattern is a time of day, on 
+      exertion, or something else. For each mention of a pattern, extract the 
+      pattern to fill in the "<pattern>" following "YES: <pattern>". For example, 
+      convert the snippet "oh, yes, in the evening" to "YES: evening".
+
+      
+      If the patient mentions multiple specific patterns, list each one on *a 
+      separate line*. For example, convert the snippet "in the afternoon and 
+      also overnight" to:
+
+      "YES: evening
+
+      YES: overnight"
+
+      
+      NOTE: Some patients may say "all the time" or "no special time". That is 
+      not a specific pattern. The patient is saying they feel bad all the time. 
+      So, do *not* answer "YES" in this case. Instead, answer "NO" from the case below.
+
+      
+      2. The patient mentions that there is no pattern or no specific pattern.
+
+      If the patient talks about a lack of pattern, answer with "NO". For example, 
+      convert the snippet "no, no pattern" to "NO".
+
+      
+      NOTE: Some patients may say "all the time" or "no special time". That is not 
+      a specific pattern. The patient is saying they feel bad all the time. So, 
+      you should answer "NO" in this case. For example, convert the snippet "yes, 
+      I feel bad all the time" to "NO" because all the time is not a specific pattern.
+
+      
+      3. The patient talks about something else.
+
+      Some patients may ignore the interviewer's question and talk about something 
+      other than patterns related to their symptoms. In these cases, answer with 
+      "IRRELEVANT". For example, convert the snippet "I feel better now" to 
+      "IRRELEVANT" since feeling better now is a current state and is irrelevant 
+      to the discussion of past patterns.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember that
+      the "YES: <pattern>" option is repeatable (once per line), but the "NO" and 
+      "IRRELEVANT" options are not and should only appear once (when the case is
+      appropriate). Do not output anything else.
+    question_ids: ["9", "9a", "9b"]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00501]
+    parser_data:
+      options:
+        - {tag: "YES", repeatable: true, value_sep: ":"}
+        - {tag: "NO", repeatable: false, value_sep: null}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_10:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide either
+      an interval of time or a specific date for how long they experienced their
+      symptoms before they sought medical attention. Format your answer by extracting 
+      either an interval of time or a specific date according to the instructions below.
+      
+      
+      Interval of time:
+      
+      1. For the interval of time, extract a numerical quantity and a unit of 
+      time (choose from: minutes, hours, days, weeks, months, years).
+      For example, "1 month" or "3 years".
+      
+      2. Convert numbers from text to digits. For example, convert the snippet
+      "three days" to "3 days".
+      
+      3. Imprecise descriptions should be approximated as the nearest common 
+      sense numerical value. For example, convert the snippet "about a month" to 
+      "1 month". For example, convert the snippet "a couple days" to "2 days". 
+      For example, convert the snippet "a few weeks" to "3 weeks". For example, 
+      convert the snippet "several years" to "3 years".
+      
+      4. If the patient expresses some immediate timeframe or state, convert these
+      to "0 minutes". For example, convert the snippet "I came right away" or
+      "I didn't wait" to "0 minutes".
+      
+      
+      Specific date:
+      
+      1. For a specific date, extract and convert the date into a YEAR-MONTH-DAY
+      numerical ISO format (YYYY-MM-DD). For example, convert the snippet
+      "May 2nd 2018" to the ISO format "2018-05-02".
+      
+      2. For any specific date that mentions only the month but not a specific year,
+      extract the string name of the month. For example, convert the snippet
+      "this past Feb" to "February".
+      
+      3. For any specific date that mentions only the year but not a specific month,
+      extract the numerical value of the year. For example, convert the snippet
+      "it happened in 2019" to "2019".
+      
+      4. For any specific date that mentions both a month and a year but not a
+      specific day of the month, assume it is the 15th day of the month *unless*
+      the patient gives an approximate day (such as "beginning" which you should
+      approximate as "1"; or "end" which you should approximate as "28"). Extract
+      a numerical date in the ISO format: YYYY-MM-DD. For example, convert the
+      snippet "March 2020" to "2020-03-15". For example, convert the snippet
+      "beginning of July 2019" as "2019-07-01". For example, convert the snippet
+      "end of October 2018" to "2018-10-28".
+      
+      5. These interviews were recorded on {reference_date}. As such, any
+      mention of "last year" should be interpreted relative to {reference_date}.
+      For example, "August of last year" would be the most recent August before
+      {reference_date}.
+      
+      6. Keep in mind that some dates may be written as text instead of numbers.
+      In these cases, convert the text into a numerical date format using the rules
+      above. For example, convert the snippet "September first twenty eighteen"
+      to "2018-09-01".
+      
+      
+      Additional instructions:
+      
+      It is possible that the patient talks about something other than an interval
+      of time or a specific date. In this case, your answer should be a single
+      word: "IRRELEVANT".
+      
+      
+      Answer with either an interval of time or a specific date according to the
+      format instructions above. Or answer with "IRRELEVANT" is no interval of
+      time or specific date is mentioned. Do not output anything else.
+    question_ids: [10]
+    parser_type: INTERVAL_OR_DATE_OR_REJECT
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00351, UHN00451]
+    system_prompt_index: 1
+    parser_data: {"reject": IRRELEVANT}
+  Q_10a:
+    prompt: >-      
+      In the snippet below, the interviewer is asking each patient why they did not seek
+      medical attention sooner for their heart failure. For each patient, your task 
+      is to convert the patient's response into or or more of the following options
+      based on the most appropriate case.
+
+
+      Options:
+
+      1. "DISMISSIVE/DENIAL"
+
+      Answer "DISMISSIVE/DENIAL" if the patient's response suggests the patient was
+      either dismissive of their symptoms or in denial that they have a problem. For
+      example, convert the snippet "I thought it would go away" to "DISMISSIVE/DENIAL".
+      For example, convert the snippet "I never expected to have heart failure" to
+      "DISMISSIVE/DENIAL".
+
+
+      2. "AFRAID"
+
+      Answer "AFRAID" if the patient's response suggests was afraid to seek medical
+      attention.
+
+
+      3. "OTHER: <reason>"
+
+      Answer "OTHER: <reason>" if the patient mentions some other reason for not
+      seeking medical attention sooner that does not fit in neatly with the above
+      options. Fill in the "<reason>" with a short (5-10 word) descriptive summary
+      of the reason the patient gives. If the patient gives more than one reason,
+      separate each reason with a comma to create a comma-separated list of reasons.
+
+
+      4. "IRRELEVANT"
+
+      Answer "IRRELEVANT" if the patient talks about something other than the
+      reason they did not seek medical attention sooner.
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I was in denial and also afraid
+      to come to the hospital" to
+      
+      "DISMISSIVE/DENIAL
+      
+      AFRAID"
+      
+      
+      CAUTION: Even though multiple options can be appropriate at the same time,
+      each individual option should only appear once (when the case is appropriate).
+      Do not output anything else.
+    question_ids: [10a]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN00051, UHN00351, UHN00101, UHN00501]
+    parser_data:
+      options:
+        - {tag: "DISMISSIVE/DENIAL", repeatable: false, value_sep: null}
+        - {tag: "AFRAID", repeatable: false, value_sep: null}
+        - {tag: "OTHER", repeatable: false, value_sep: ":"}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_11_11a:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they 
+      have been previously hospitalized for the same symptoms they are currently
+      experiencing. For each patient, your task is to extract and categorize the 
+      most appropriate answer from the following options.
+
+
+      Options:
+
+      1. "NEVER"
+
+      Answer with "NEVER" if the patient expresses that they have never been 
+      previously hospitalized for their current symptoms.
+
+
+      2. "30 DAYS"
+
+      Answer with "30 DAYS" if the patient expresses that they have been previously 
+      hospitalized for their current symptoms specifically within the last 30 days.
+
+      
+      3. "6 MONTHS"
+      
+      Answer with "6 MONTHS" if the patient expresses that they have been previously
+      hospitalized for their current symptoms specifically within the last 6 months.
+
+      
+      4. "1 YEAR"
+      
+      Answer with "1 YEAR" if the patient expresses that they have been previously 
+      hospitalized for their current symptoms specifically within the last year. 
+      Keep in mind that some patients will express a specific month instead of 
+      mentioning a year. In this case, they mean the most recent occurrence of 
+      that month, so it must be within a year. For example, convert the snippet 
+      "last November" to "1 YEAR" because the patient is clearly intending to 
+      mean the most recent past November (the one that happened within 1 year).
+      
+      
+      5. "5 YEARS"
+
+      Answer with "5 YEARS" if the patient expresses that they have been previously 
+      hospitalized for their current symptoms specifically within the last 5 years. 
+      Keep in mind that the interview is taking place on {reference_date}. As
+      such, any  mention of a specific year should be calculated relative to
+      {reference_date}. For example, convert the snippet "yeah, in 2017" to the
+      answer "5 YEARS" because the gap between 2017-01-01 and {reference_date}
+      is less than 5 years.
+
+      
+      6. "YES, BUT NO TIME GIVEN"
+
+      Answer with "YES, BUT NO TIME GIVEN" if the patient expresses that they have 
+      been previously hospitalized for their current symptoms, but without 
+      elaborating as to how long ago it was.
+
+      
+      7. "YES, BUT FOR OTHER SYMPTOMS"
+
+      Answer with "YES, BUT FOR OTHER SYMPTOMS" if the patient expresses that they 
+      have been previously hospitalized, but not for their current symptoms.
+      
+      
+      8. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than their previous 
+      hospitalization.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["11", "11a"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00151, UHN00501]
+    parser_data:
+      enum_options:
+        - "NEVER"
+        - "30 DAYS"
+        - "6 MONTHS"
+        - "1 YEAR"
+        - "5 YEARS"
+        - "YES, BUT NO TIME GIVEN"
+        - "YES, BUT FOR OTHER SYMPTOMS"
+        - "IRRELEVANT"
+  Q_11b:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient how their 
+      current symptoms compare to the symptoms of their previous hospitalization. 
+      For each patient, your task is to extract and categorize the most 
+      appropriate answer from the following options.
+
+
+      Options:
+
+      1. "BETTER"
+
+      Answer with "BETTER" if the patient expresses that they feel better now 
+      than before.
+
+
+      2. "SAME"
+
+      Answer with "SAME" if the patient expresses that they feel about the same 
+      now as before.
+
+      
+      3. "WORSE"
+      
+      Answer with "WORSE" if the patient expresses that they feel worse now than before.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than how they feel 
+      now compared to their previous hospitalization.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [11b]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101, UHN00151, UHN00251, UHN00301]
+    parser_data: {enum_options: ["BETTER", "SAME", "WORSE", "IRRELEVANT"]}
+  Q_12:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to give a 
+      number on a scale of 1 to 10 to describe their general state of health. For 
+      each patient, your task is to extract a numerical value from their answer.
+
+      
+      Sometimes the numerical value will be spelled out, like "three". In these
+      cases, convert the value to the equivalent number. For example, convert 
+      "three" to "3".
+      
+      Interpret the patient saying something along the lines of "not good" or "very 
+      bad" as a score of "1". Interpret the patient saying something along the lines 
+      of "somewhat" or "middle amount" as a score of "5". Interpret the patient saying
+      something along the lines of "very good" or "best" or as a score of "10".
+
+      
+      If the patient fails to give a numerical response, answer with "IRRELEVANT".
+      
+      
+      If the patient is undecided between two values, answer with the in between score
+      with ".5" added. For example, convert the snippet "7 or 8" to "7.5".
+
+      
+      To summarize, your answer should be either the single word "IRRELEVANT" or
+      a number between 1 and 10. Do not output anything else.
+    question_ids: [12]
+    parser_type: SCORE_OR_REJECT
+    few_shot_assign_ids: [UHN0001, UHN00251, UHN00501]
+    system_prompt_index: 2
+    parser_data: {min_score: 1.0, max_score: 10.0, reject: IRRELEVANT}
+  Q_13:
+    prompt: >-      
+      In the snippet below, the interviewer is asking each patient where they seek
+      medical attention. For each patient, your task is to convert the patient's
+      response into or or more of the following options based on the most
+      appropriate case.
+      
+      
+      NOTE: Your task is to extract the patient's response *for this admission*. For
+      example, a patient might say "I usually go to my doctor, but this time I came
+      here to the Toronto General Hospital". In this case, your answer should be
+      "HOSPITAL: Toronto General" (as per the options below), because that is where
+      the patient went for this admission (even if they normally go to their doctor).
+
+
+      Options:
+
+      1. "HOSPITAL: <name_of_hospital>"
+
+      Answer "HOSPITAL: <name_of_hospital>" if the patient mentions seeking medical
+      attention at a hospital. Fill in "<name_of_hospital>" with the name of the
+      hospital that the patient mentions.
+      
+      
+      NOTE: Typically if a patient mentions a place name without any additional 
+      context, they are referring to the hospital in that place. For example, the
+      a patient response of "Toronto General" means "Toronto General Hospital" so
+      you should answer "HOSPITAL: Toronto General".
+      
+      
+      NOTE: If the patient mentions "this" hospital, fill in "<name_of_hospital>"
+      with the special tag "THIS". For example, convert the snippet "I came to
+      this hospital" to "HOSPITAL: THIS".
+      
+      
+      NOTE: If the patient mentions coming to hospital but fails to give a 
+      specific name, fill in "<name_of_hospital>" with the special tag "UNKNOWN".
+      For example, convert the snippet "I came to the hospital" to "HOSPITAL: UNKNOWN".
+
+      
+      2. "DOCTOR: <specialty>"
+
+      Answer "DOCTOR: <specialty>" if the patient mentions going to a doctor to seek
+      medical attention for this admission. Fill in "<specialty>" with the name of the
+      doctor's specialty if mentioned. These can include, but are not limited to:
+      
+      - family
+      
+      - cardiologist
+      
+      - heart surgeon
+      
+      etc.
+      
+      
+      NOTE: If the patient mentions going to see a doctor but fails to give a 
+      specific speciality, fill in "<specialty>" with the special tag "UNKNOWN".
+      For example, convert the snippet "I went to see my doctor" to "DOCTOR: UNKNOWN".
+
+
+      3. "DEPARTMENT: <which>"
+
+      Answer "DEPARTMENT: <which>" if the patient mentions a specific department
+      where they sought medical attention. Fill in "<which>" with the name of the
+      department that the patient mentions. For example, convert the snippet
+      "I went to the emergency" to "DEPARTMENT: emergency". You should also
+      consider any mention of clinics are a department. For example, convert the
+      snippet "I went to my clinic" to DEPARTMENT: clinic".
+
+
+      4. "OTHER"
+      
+      Answer "OTHER" for any specific mention of a place where the patient went
+      to seek medical attention for this admission that does not fit in the
+      categories of "HOSPITAL", "DOCTOR", or "DEPARTMENT".
+      
+      
+      5. "IRRELEVANT"
+
+      Answer "IRRELEVANT" if the patient talks about something other than the
+      where they went to seek medical attention for this admission.
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I went to Toronto General, 
+      specifically the emergency department" to
+      
+      "HOSPITAL: Toronto General
+      
+      DEPARTMENT: emergency"
+      
+      
+      NOTE: "HOSPITAL: <name_of_hospital>", "DOCTOR: <specialty>", and
+      "DEPARTMENT: <which>" can appear multiple times for each unique
+      "<name_of_hospital>", "<specialty>", and "<which>", respectively. Each
+      new occurrence should appear on a newline.
+      
+      
+      NOTE: "OTHER" and "IRRELEVANT" should only appear once (when the case is
+      appropriate).
+      
+      
+      Answer according to the format specification described above.
+      Do not output anything else.
+    question_ids: [13]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN00351, UHN00401, UHN00501]
+    parser_data:
+      options:
+        - {tag: "HOSPITAL", repeatable: true, value_sep: ":"}
+        - {tag: "DOCTOR", repeatable: true, value_sep: ":"}
+        - {tag: "DEPARTMENT", repeatable: true, value_sep: ":"}
+        - {tag: "OTHER", repeatable: false, value_sep: null}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_14:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or 
+      not they have a family physician. For each patient, your task is to extract 
+      one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+
+      Answer with "YES" if the patient expresses that they do have a family physician.
+
+
+      2. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* have a family 
+      physician.
+
+      
+      3. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they 
+      have a family physician.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [14]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00451, UHN00301]
+    parser_data: {enum_options: ["YES", "NO", "IRRELEVANT"]}
+  Q_15:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not they
+      have a good relationship with their family physician. For each patient, your task
+      is to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "EXCELLENT"
+
+      Answer with "EXCELLENT" if the patient expresses that they have an excellent,
+      outstanding, very good, or great relationship with their family physician.
+
+
+      2. "YES"
+      
+      Answer with "YES" if the patient expresses that they do have a good relationship
+      with their family physician.
+      
+      
+      3. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses having only a somewhat good
+      relationship with their family physician. This can include expressions such
+      as "sure" or "I guess so".
+      
+      
+      4. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* have a good
+      relationship with their family physician.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they 
+      have a good relationship with their family physician.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [15]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00501, UHN00301, UHN00351]
+    parser_data: {enum_options: ["EXCELLENT", "YES", "SOMEWHAT", "NO", "IRRELEVANT"]}
+  Q_16:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not they
+      feel comfortable speaking to their family physician. For each patient, your task
+      is to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they do feel comfortable
+      speaking to their family physician.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses feeling only somewhat 
+      comfortable speaking to their family physician. This can include expressions
+      such as "sure" or "I guess so".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* feel comfortable 
+      speaking to their family physician.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they 
+      feel comfortable speaking to their family physician.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [16]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00351, UHN00251]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "IRRELEVANT"]}
+  Q_16a:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not they
+      feel their concerns are heard when speaking to their family physician. For each
+      patient, your task is to extract one of the following options based on the most 
+      appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they do feel their concerns 
+      are heard when speaking to their family physician.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses feeling that their concerns
+      are only somewhat being heard when speaking to their family physician. This
+      can include expressions such as "sure" or "I guess so".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* feel their 
+      concerns are heard when speaking to their family physician.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they 
+      feel their concerns are heard when speaking to their family physician.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [16a]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00151, UHN00351, UHN00301]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "IRRELEVANT"]}
+  Q_16b:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not
+      their family physician is the same gender as them. For each patient, your task
+      is to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that their family physician is
+      the same gender as them.
+      
+      
+      2. "UNSURE"
+      
+      Answer with "UNSURE" if the patient expresses uncertainty about whether their
+      family physician is the same gender as them. This can include expressions
+      such as "I never asked" or "I don't know".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that their family physician is
+      *not* the same gender as them.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether their
+      family physician is the same gender as them.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [16b]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00101, UHN00151]
+    parser_data: {enum_options: ["YES", "UNSURE", "NO", "IRRELEVANT"]}
+  Q_16c1:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not their
+      family physician has the same ethnicity as them. For each patient, your task
+      is to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that their family physician has
+      the same ethnicity as them.
+      
+      
+      2. "UNSURE"
+      
+      Answer with "UNSURE" if the patient expresses uncertainty about whether their
+      family physician has the same ethnicity as them. This can include expressions
+      such as "I never asked" or "I don't know".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that their family physician does
+      *not* have the same ethnicity as them.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether their
+      family physician has the same ethnicity as them.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["16c", "16c1"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00301]
+    parser_data: {enum_options: ["YES", "UNSURE", "NO", "IRRELEVANT"]}
+  Q_16c2:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what the ethnicity
+      of their family physician is. For each patient, your task is to extract and
+      categorize the most appropriate answer from the following options.
+
+
+      Options:
+
+      1. "ETHNICITY: <value>"
+
+      Answer "ETHNICITY: <value>" if the patient mentions the specific ethnicity
+      of their family physician. Fill in the "<value>" in the "ETHNICITY: <value>"
+      tag. For example, convert the snippet "she's Russian" to "ETHNICITY: Russian".
+
+      
+      2. "UNSURE"
+
+      Answer with "UNSURE" if the patient expresses uncertainty about the ethnicity
+      of their family physician. This can include expressions such as "I never asked"
+      or "I don't know".
+
+      
+      3. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than the ethnicity
+      of their family physician.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember to fill in
+      the "<value>" in the "ETHNICITY: <value>" option. Do not output anything else.
+    question_ids: ["16c", "16c2"]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN0001, UHN00151, UHN00251, UHN00201, UHN00351]
+    parser_data:
+      options:
+        - {tag: "ETHNICITY", repeatable: false, value_sep: ":"}
+        - {tag: "UNSURE", repeatable: false, value_sep: null}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_16d:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or 
+      not they receive medical information from their family physician. For each 
+      patient, your task is to extract one of the following options based on the 
+      most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they do receive medical 
+      information from their family physician.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses that they only somewhat 
+      receive medical information from their family physician. This can include 
+      expressions such as "sure" or "I guess so".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* receive medical 
+      information from their family physician.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they 
+      receive medical information from their family physician.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [16d]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00051, UHN00201, UHN00301, UHN00501]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "IRRELEVANT"]}
+  Q_16e1:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what language they
+      use to communicate with their family physician. For each patient, your task is to 
+      extract and categorize the most appropriate answer from the following options.
+
+
+      Options:
+
+      1. "LANGUAGE: <value>"
+
+      Answer "LANGUAGE: <value>" if the patient mentions the specific language in
+      which they communicate with their family physician. Fill in the "<value>" in
+      the "LANGUAGE: <value>" tag. For example, convert the snippet "we speak Russian" 
+      to "LANGUAGE: Russian".
+
+      
+      2. "UNKNOWN"
+
+      Answer with "UNKNOWN" if the patient expresses uncertainty about what language
+      they use to communicate with their family physician. This can include
+      expressions such as "I don't know" or "many different languages".
+
+      
+      3. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than the language they
+      use to communicate with their family physician.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember to fill in
+      the "<value>" in the "LANGUAGE: <value>" option. Do not output anything else.
+    question_ids: ["16e", "16e1"]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00301]
+    parser_data:
+      options:
+        - {tag: "LANGUAGE", repeatable: false, value_sep: ":"}
+        - {tag: "UNKNOWN", repeatable: false, value_sep: null}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_16e2:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not they 
+      are comfortable speaking in this language. For each patient, your task is to 
+      extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they are comfortable 
+      speaking in this language.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses that they are only somewhat 
+      comfortable speaking in this language. This can include  expressions such as 
+      "sure" or "I guess so".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they are *not* are comfortable
+      speaking in this language.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they 
+      are comfortable speaking in this language.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["16e", "16e2"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00251, UHN00401]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "IRRELEVANT"]}
+  Q_16e3:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what their
+      native language is. For each patient, your task is to extract and 
+      categorize the most appropriate answer from the following options.
+
+
+      Options:
+
+      1. "LANGUAGE: <value>"
+
+      Answer "LANGUAGE: <value>" if the patient mentions a specific native language.
+      Fill in the "<value>" in the "LANGUAGE: <value>" tag. For example, convert the
+      snippet "Russian" to "LANGUAGE: Russian".
+      
+      
+      If the patient mentions multiple specific languages as their native languages,
+      list each one on *a separate line*. For example, convert the snippet 
+      "equally both Russian and English" to:
+
+      "LANGUAGE: Russian
+
+      LANGUAGE: English"
+
+      
+      2. "UNKNOWN"
+
+      Answer with "UNKNOWN" if the patient expresses uncertainty about what their
+      native language is. This can include expressions such as "I don't know" or
+      "many different languages".
+
+      
+      3. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than what their
+      native language is.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember
+      that the "LANGUAGE: <value>" option is repeatable (once per line), but the 
+      "UNKNOWN" and "IRRELEVANT" options are not and should only appear once 
+      (when appropriate). Do not output anything else.
+    question_ids: ["16e", "16e3"]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN00201, UHN00101, UHN00251]
+    parser_data:
+      options:
+        - {tag: "LANGUAGE", repeatable: true, value_sep: ":"}
+        - {tag: "UNKNOWN", repeatable: false, value_sep: null}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_17:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide a 
+      list of their primary sources of medical information from the following 
+      set of options:
+      
+      - INTERNET
+      
+      - FAMILY
+      
+      - FRIENDS
+      
+      - DOCTOR
+      
+      - NURSE
+      
+      - PHARMACIST
+      
+      - NEWS
+      
+      - MAGAZINES
+
+      
+      For each patient, your task is to extract a list of the above options from 
+      the patient's response. Format your answer by separating each listed option 
+      with a comma ",".
+
+      
+      NOTE: It is possible that the patient mentions "all of the above" in 
+      reference to the above list of options. In this case, your answer should 
+      be a single word: "ALL".
+
+      
+      NOTE: It is possible that the patient talks about something other than 
+      their primary source of medical information. In this case, your answer 
+      should be a single word: "IRRELEVANT".
+
+      
+      Answer with either "ALL" or "IRRELEVANT" (special cases), or a comma-separated 
+      list of the options above (general case). Do not output anything else.
+    question_ids: [17]
+    parser_type: LIST_OF_ENUMS
+    few_shot_assign_ids: [UHN00051, UHN00401, UHN00501]
+    parser_data:
+      enum_options:
+        - INTERNET
+        - FAMILY
+        - FRIENDS
+        - DOCTOR
+        - NURSE
+        - PHARMACIST
+        - NEWS
+        - MAGAZINES
+        - ALL
+        - IRRELEVANT
+  Q_18:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to state who 
+      is their first or most trusted person they turn to for their medical questions 
+      or concerns. For each patient, your task is to extract and categorize their 
+      response into one of the following set of options:
+      
+      - INTERNET
+      
+      - FAMILY
+      
+      - FRIENDS
+      
+      - DOCTOR
+      
+      - NURSE
+      
+      - PHARMACIST
+      
+      - NEWS
+      
+      - MAGAZINES
+
+      
+      NOTE: It is possible that the patient mentions "all of the above" in 
+      reference to the above list of options. In this case, your answer should 
+      be a single word: "ALL".
+
+      
+      NOTE: It is possible that the patient talks about something other than 
+      the person they turn to for medical information. In this case, your answer 
+      should be a single word: "IRRELEVANT".
+
+      
+      Answer with either "ALL" or "IRRELEVANT" (special cases), or with the most
+      appropriate of the options listed above (general case). Do not output
+      anything else.
+    question_ids: [18]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00401]
+    parser_data:
+      enum_options:
+        - INTERNET
+        - FAMILY
+        - FRIENDS
+        - DOCTOR
+        - NURSE
+        - PHARMACIST
+        - NEWS
+        - MAGAZINES
+        - ALL
+        - IRRELEVANT
+  Q_19:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or
+      not they take any medication. For each patient, your task is to extract
+      one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they do take medication.
+      
+      
+      2. "UNSURE"
+      
+      Answer with "UNSURE" if the patient expresses uncertainty about whether they
+      take medication. This can include expressions such as "I can't remember" or
+      "I don't know".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* take any medication.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether or
+      not they take medication.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [19]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00401, UHN00051, UHN00451, UHN00301]
+    parser_data: {enum_options: ["YES", "UNSURE", "NO", "IRRELEVANT"]}
+  Q_19a:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient if they know
+      what their medication is for. For each patient, your task is to extract a
+      list of either medication names or the stated purpose of the medication
+      from the patient's response. Format your answer by separating each listed
+      item with a comma ",".
+      
+      
+      NOTE: It is possible that the patient talks about something other than their
+      medications. In this case, your answer should be a single word: "IRRELEVANT".
+      
+      
+      NOTE: If the patient answers in the affirmative, but without expanding further,
+      answer with "NO DETAILS". For example, convert the snippet "yes, I do know 
+      what they are for" to "NO DETAILS" since the patient provides no details on
+      which specific medication they are taking.
+      
+      
+      NOTE: If the patient answers that they do take medication but that they do
+      *not* know what the medication is for, add "UNKNOWN" to the list. For example,
+      convert the snippet "one medication is for my heart, and I also take one other
+      medication, but I don't know what it's for" to "heart, UNKNOWN".
+      
+      
+      Output either "IRRELEVANT" or "NO DETAILS" or a comma-separated list of
+      medication names or of the stated purpose of a medication (which can include
+      "UNKNOWN" when the patient does not know the purpose of a medication).
+      Do not output anything else.
+    question_ids: [19a]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00351, UHN00401]
+    parser_data: {"enum_options": ["IRRELEVANT", "NO DETAILS"]}
+  Q_19b:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or 
+      not they find their medications help them. For each patient, your task is
+      to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that their medications to help them.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses that their medications only
+      somewhat help them. This can include expressions such as "sure" or "I guess so".
+      
+      
+      3. "PARTIAL"
+
+      Answer "PARTIAL" if the patient expresses that only some of their medications
+      help them while others do not. This can include expressions such as "a few"
+      or "some do".
+      
+      
+      4. "NO"
+
+      Answer with "NO" if the patient expresses that their medications do *not*
+      help them. 
+
+      
+      5. "UNSURE"
+
+      Answer "UNSURE" if the patient expresses doubt or uncertainty instead of 
+      giving a definitive response.
+
+      
+      6. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether their
+      medications help them.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [19b]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00151, UHN00201, UHN00351, UHN00451]
+    parser_data:
+      enum_options:
+        - "YES"
+        - "SOMEWHAT"
+        - "PARTIAL"
+        - "NO"
+        - "UNSURE"
+        - "IRRELEVANT"
+  Q_19c:
+    prompt: >-      
+      In the snippet below, the interviewer is asking each patient whether or not
+      they feel better, the same, or worse since starting their medication. For
+      each patient, your task is to convert the patient's response into or or more
+      of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "BETTER: <medication or purpose>"
+
+      For each specific medication that the patient mentions makes them feel better,
+      answer with "BETTER: <medication or purpose>". Fill "<medication or purpose>"
+      with the name of the medication or the stated purpose of the medication. For
+      example, convert "Lasix makes me feel better" to "BETTER: Lasix" since Lasix
+      is the name of a medication. For example, convert "the one for the heart
+      makes me feel better" to "BETTER: heart".
+      
+      
+      NOTE: If the patient mentions feeling better but without specifying which
+      medication, fill in "<medication or purpose>" with the special tag
+      "UNSPECIFIED". For example, convert the snippet "Yes, it makes me feel
+      better" to "BETTER: UNSPECIFIED", since the patient fails to specify which
+      specific medication makes them feel better.
+      
+      
+      2. "SAME: <medication or purpose>"
+
+      For each specific medication that the patient mentions makes them feel the same,
+      answer with "SAME: <medication or purpose>". Fill "<medication or purpose>"
+      with the name of the medication or the stated purpose of the medication. For
+      example, convert "Lasix makes me feel the same" to "SAME: Lasix" since Lasix
+      is the name of a medication. For example, convert "the one for the heart
+      makes me feel the same" to "SAME: heart".
+
+
+      NOTE: If the patient mentions feeling the same but without specifying which
+      medication, fill in "<medication or purpose>" with the special tag
+      "UNSPECIFIED". For example, convert the snippet "It makes me feel the same"
+      to "SAME: UNSPECIFIED", since the patient fails to specify which
+      specific medication makes them feel the same.
+
+
+      3. "WORSE: <medication or purpose>"
+
+      For each specific medication that the patient mentions makes them feel worse,
+      answer with "WORSE: <medication or purpose>". Fill "<medication or purpose>"
+      with the name of the medication or the stated purpose of the medication. For
+      example, convert "Lasix makes me feel worse" to "WORSE: Lasix" since Lasix
+      is the name of a medication. For example, convert "the one for the heart
+      makes me feel worse" to "WORSE: heart".
+
+
+      NOTE: If the patient mentions feeling worse but without specifying which
+      medication, fill in "<medication or purpose>" with the special tag
+      "UNSPECIFIED". For example, convert the snippet "It makes me feel worse"
+      to "WORSE: UNSPECIFIED", since the patient fails to specify which
+      specific medication makes them feel worse.
+
+
+      4. "UNSURE: <medication or purpose>"
+
+      For each specific medication that the patient mentions where they are unsure
+      whether it makes them feel better, the same, or worse, answer with "UNSURE:
+      <medication or purpose>". Fill "<medication or purpose>" with the name of
+      the medication or the stated purpose of the medication. For example, convert
+      "I don't know if Lasix is helping" to "UNSURE: Lasix" since Lasix
+      is the name of a medication. For example, convert "the one for the heart
+      I don't know if it's helping" to "UNSURE: heart".
+
+
+      NOTE: If the patient mentions they are unsure but without specifying which
+      medication they are unsure about, fill in "<medication or purpose>" with
+      the special tag "UNSPECIFIED". For example, convert the snippet "I'm not
+      sure if it's helping" to "UNSURE: UNSPECIFIED", since the patient fails to
+      specify which specific medication they are unsure about.
+      
+      
+      5. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether or not
+      their medication is making them feel better, the same or, worse.
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "The Lasix is helping, but the
+      other I'm not sure" to
+      
+      "BETTER: Lasix
+      
+      UNSURE: UNSPECIFIED"
+      
+      
+      NOTE: "IRRELEVANT" should only appear once (when the case is appropriate).
+      
+      
+      Answer according to the format specification described above.
+      Do not output anything else.
+    question_ids: [19c]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN00151, UHN00201, UHN00301, UHN00351, UHN00451]
+    parser_data:
+      options:
+        - {tag: "BETTER", repeatable: true, value_sep: ":"}
+        - {tag: "SAME", repeatable: true, value_sep: ":"}
+        - {tag: "WORSE", repeatable: true, value_sep: ":"}
+        - {tag: "UNSURE", repeatable: true, value_sep: ":"}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_19d:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or
+      not they need help taking their medication. For each patient, your task is
+      to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they do need help taking
+      their medication.
+      
+      
+      2. "UNSURE"
+      
+      Answer with "UNSURE" if the patient expresses uncertainty about whether 
+      they need help taking their medication. This can include expressions such
+      as "I can't remember" or "I don't know".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* need help 
+      taking their medication.
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether or
+      not they need help taking their medication.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [19d]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101, UHN0001, UHN00251, UHN00301]
+    parser_data: {enum_options: ["YES", "UNSURE", "NO", "IRRELEVANT"]}
+  Q_20:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide a 
+      list of what they believe to be the greatest health concerns facing Canadians. 
+      For each patient, your task is to extract a list of health concerns from the 
+      patient's response. Format your answer by separating each listed symptom with 
+      a comma ",". It is possible that the patient talks about something other than 
+      their health concerns facing Canadians. In this case, your answer should be a 
+      single word: "IRRELEVANT".
+      
+      
+      Output either "IRRELEVANT" or a comma-separated list of health concerns 
+      facing Canadians. Do not output anything else.
+    question_ids: [20]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN00201, UHN0001, UHN00251, UHN00301]
+    parser_data: {"enum_options": [IRRELEVANT]}
+  Q_21_htn:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      hypertension. For each patient, your task is to determine if the patient
+      mentions hypertension in their response. Answer with "YES" if the patient
+      directly mentions hypertension or directly describes the definition of
+      hypertension as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_21_diabetes:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      diabetes. For each patient, your task is to determine if the patient
+      mentions diabetes in their response. Answer with "YES" if the patient
+      directly mentions diabetes or directly describes the definition of
+      diabetes as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101, UHN00151, UHN00251]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_21_salt:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      salt. For each patient, your task is to determine if the patient
+      mentions salt in their response. Answer with "YES" if the patient
+      directly mentions salt or directly describes the definition of
+      salt as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101, UHN00351, UHN00151]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_21_fluid:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      fluids. For each patient, your task is to determine if the patient
+      mentions fluids in their response. Answer with "YES" if the patient
+      directly mentions fluids or directly describes the definition of
+      fluids as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_21_cholesterol:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      cholesterol. For each patient, your task is to determine if the patient
+      mentions cholesterol in their response. Answer with "YES" if the patient
+      directly mentions cholesterol or directly describes the definition of
+      cholesterol as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101, UHN00151, UHN00351]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_21_smoking:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      smoking. For each patient, your task is to determine if the patient
+      mentions smoking in their response. Answer with "YES" if the patient
+      directly mentions smoking or directly describes the definition of
+      smoking as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101, UHN00151]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_21_fam_history:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      family history. For each patient, your task is to determine if the patient
+      mentions family history in their response. Answer with "YES" if the patient
+      directly mentions family history or directly describes the definition of
+      family history as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_21_heart_attack:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      know any of the risk factors for heart failure. Your task is to focus on:
+      heart attack. For each patient, your task is to determine if the patient
+      mentions heart attack in their response. Answer with "YES" if the patient
+      directly mentions heart attack or directly describes the definition of
+      heart attack as a risk factor for heart failure. Answer with "NO" for any
+      other patient response. Do not output anything else.
+    question_ids: [21]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00101]
+    parser_data: {enum_options: ["YES", "NO"]}
+  Q_22:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they 
+      worry about their health and, if so, what their biggest worry is. For each 
+      patient, your task is to determine if the patient is worried and, if so, 
+      what that worry is. Extract the categorize the most appropriate answer from 
+      the following options. 
+      
+      
+      Options:
+
+      1. "YES: <worry>"
+
+      Answer "YES: <worry>" if the patient mentions that they do worry about their
+      health. Fill in "<worry>" a description of their biggest worry.
+      
+      
+      Some common worries are:
+
+      - body system (e.g., heart, kidneys, etc.)
+
+      - family
+
+      - function
+
+      
+      If the patient mentions any of these directly, use the corresponding key term as 
+      your summary of the patient's response. For example, convert the snippet "I want 
+      to go back to functioning normally" to "YES: function". For example, convert the 
+      snippet "I'm worried about my kidneys" to "YES: kidneys". If the patient mentions 
+      some other biggest worry, summarize that worry into a 1-3 word description.
+      
+      
+      If patient mentions more than one worry, group these individual worries into
+      a comma-separated list of worries. For example, convert the snippet "I'm 
+      worried about my heart and my kidneys" to "YES: heart, kidneys".
+      
+      
+      NOTE: If the patient mentions being worried but without specifying a clear
+      worry, fill in "<worry>" with the special tag "UNSPECIFIED". For example,
+      convert the snippet "Yes, I'm worried" to "YES: UNSPECIFIED", since the
+      patient fails to specify which specific worry they have.
+
+      
+      2. "SOMEWHAT: <worry>"
+
+      Answer "SOMEWHAT: <worry>" if the patient mentions that they are only somewhat
+      worried about their health. This can include expressions such as "sure" or
+      "I guess so". Fill in "<worry>" a description of their biggest worry.
+      
+      
+      Some common worries are:
+
+      - body system (e.g., heart, kidneys, etc.)
+
+      - family
+
+      - function
+
+      
+      If the patient mentions any of these directly, use the corresponding key term as 
+      your summary of the patient's response. For example, convert the snippet "I'm a 
+      little bit worried about my kidneys" to "SOMEWHAT: kidneys". If the patient
+      mentions some other biggest worry, summarize it into a 1-3 word description.
+      
+      
+      If patient mentions more than one worry, group these individual worries into
+      a comma-separated list of worries. For example, convert the snippet "I'm a little
+      bit worried about my heart and my kidneys" to "SOMEWHAT: heart, kidneys".
+      
+      
+      NOTE: If the patient mentions being worried but without specifying a clear
+      worry, fill in "<worry>" with the special tag "UNSPECIFIED". For example,
+      convert the snippet "I'm a little worried" to "SOMEWHAT: UNSPECIFIED",
+      since the patient fails to specify which specific worry they have.
+
+
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* worry about
+      their health.
+
+
+      4. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether or
+      not they worry about their health and, if so, what their biggest worry is.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above according to
+      the format specified above. Do not output anything else.
+    question_ids: ["22", "22a"]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN00101, UHN00151, UHN00301, UHN00351, UHN00451]
+    parser_data:
+      options:
+        - {tag: "YES", repeatable: false, value_sep: ":"}
+        - {tag: "SOMEWHAT", repeatable: false, value_sep: ":"}
+        - {tag: "NO", repeatable: false, value_sep: null}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_23:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what their
+      ethnicity is. For each patient, your task is to extract and categorize the
+      most appropriate answer from the following options.
+
+
+      Options:
+
+      1. "ETHNICITY: <value>"
+
+      Answer "ETHNICITY: <value>" if the patient mentions their specific ethnicity. Fill
+      in the "<value>" in the "ETHNICITY: <value>" tag with the specific ethnicity
+      mentioned. For example, convert the snippet "I'm Russian" to "ETHNICITY: Russian".
+
+      
+      2. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than their ethnicity.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember to fill in
+      the "<value>" in the "ETHNICITY: <value>" option. Do not output anything else.
+    question_ids: [23]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN00051, UHN00101, UHN00151, UHN00251]
+    parser_data:
+      options:
+        - {tag: "ETHNICITY", repeatable: false, value_sep: ":"}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_24:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what country
+      they were born in. For each patient, your task is to extract and categorize
+      the most appropriate answer from the following options.
+
+
+      Options:
+
+      1. "COUNTRY: <value>"
+
+      Answer "COUNTRY: <value>" if the patient mentions their specific country of
+      birth. Fill in the "<value>" in the "COUNTRY: <value>" tag with the mentioned
+      country. For example, convert the snippet "In Russia" to "COUNTRY: Russia".
+
+      
+      2. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than their country
+      of birth.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember to fill in
+      the "<value>" in the "COUNTRY: <value>" option. Do not output anything else.
+    question_ids: [24]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN0001, UHN00101, UHN00251, UHN00501]
+    parser_data:
+      options:
+        - {tag: "COUNTRY", repeatable: false, value_sep: ":"}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_24a:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide
+      either an interval of time or a specific date for how long they have been
+      in Canada. Format your answer by extracting either an interval of time or
+      a specific date according to the instructions below.
+      
+      
+      Interval of time:
+      
+      1. For the interval of time, extract a numerical quantity and a unit of 
+      time (choose from: minutes, hours, days, weeks, months, years).
+      For example, "1 month" or "3 years".
+      
+      2. Convert numbers from text to digits. For example, convert the snippet
+      "three days" to "3 days".
+      
+      3. Imprecise descriptions should be approximated as the nearest common 
+      sense numerical value. For example, convert the snippet "about a month" to 
+      "1 month". For example, convert the snippet "a couple days" to "2 days". 
+      For example, convert the snippet "a few weeks" to "3 weeks". For example, 
+      convert the snippet "several years" to "3 years".
+      
+      
+      Specific date:
+      
+      1. For a specific date, extract and convert the date into a YEAR-MONTH-DAY
+      numerical ISO format (YYYY-MM-DD). For example, convert the snippet
+      "May 2nd 2018" to the ISO format "2018-05-02".
+      
+      2. For any specific date that mentions only the month but not a specific year,
+      extract the string name of the month. For example, convert the snippet
+      "this past Feb" to "February".
+      
+      3. For any specific date that mentions only the year but not a specific month,
+      extract the numerical value of the year. For example, convert the snippet
+      "it happened in 2019" to "2019".
+      
+      4. For any specific date that mentions both a month and a year but not a
+      specific day of the month, assume it is the 15th day of the month *unless*
+      the patient gives an approximate day (such as "beginning" which you should
+      approximate as "1"; or "end" which you should approximate as "28"). Extract
+      a numerical date in the ISO format: YYYY-MM-DD. For example, convert the
+      snippet "March 2020" to "2020-03-15". For example, convert the snippet
+      "beginning of July 2019" as "2019-07-01". For example, convert the snippet
+      "end of October 2018" to "2018-10-28".
+      
+      5. These interviews were recorded on {reference_date}. As such, any
+      mention of "last year" should be interpreted relative to {reference_date}.
+      For example, "August of last year" would be the most recent August before
+      {reference_date}.
+      
+      6. Keep in mind that some dates may be written as text instead of numbers.
+      In these cases, convert the text into a numerical date format using the rules
+      above. For example, convert the snippet "September first twenty eighteen"
+      to "2018-09-01".
+      
+      
+      Additional instructions:
+      
+      It is possible that the patient talks about something other than an interval
+      of time or a specific date. In this case, your answer should be a single
+      word: "IRRELEVANT". You should also answer with "IRRELEVANT" if the patient
+      doesn't give a specific interval of time or data. For example, convert the
+      snippet "a long time" to "IRRELEVANT". For example, convert the snippet "I
+      don't remember" to "IRRELEVANT".
+      
+      
+      Answer with either an interval of time or a specific date according to the
+      format instructions above. Or answer with "IRRELEVANT" is no interval of
+      time or specific date is mentioned. Do not output anything else.
+    question_ids: [24a]
+    parser_type: INTERVAL_OR_DATE_OR_REJECT
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00151, UHN00301]
+    system_prompt_index: 1
+    parser_data: {"reject": IRRELEVANT}
+  Q_25:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what their
+      highest level of education is. For each patient, your task is to extract
+      one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "NONE"
+      
+      Answer with "NONE" if the patient did not attend any education whatsoever.
+      
+      
+      2. "SOME GRADE SCHOOL"
+      
+      Answer with "SOME GRADE SCHOOL" if the patient did some grade school (also
+      known as primary or elementary school), but did *not* finish grade school.
+      
+      
+      3. "COMPLETED GRADE SCHOOL"
+      
+      Answer with "COMPLETED GRADE SCHOOL" if the patient's highest level of completed
+      education is grade school (also known as primary or elementary school).
+      
+      
+      4. "SOME HIGH SCHOOL"
+      
+      Answer with "SOME HIGH SCHOOL" if the patient did some high school (also
+      secondary school), but did *not* finish high school.
+      
+      
+      5. "COMPLETED HIGH SCHOOL"
+      
+      Answer with "COMPLETED HIGH SCHOOL" if the patient's highest level of completed
+      education is high school (also known as secondary school).
+      
+      
+      6. "TRADE SCHOOL"
+
+      Answer with "TRADE SCHOOL" if the patient's highest level of education is
+      a trade school or vocation school. Examples include: "plumber" or "electrician".
+      
+      
+      7. "CERTIFICATE"
+      
+      Answer with "CERTIFICATE" if the patient completed some sort of Post-Secondary
+      Certificate or Diploma (or equivalent degree). Examples include: Journeyman
+      Certificates or Technical Education Diplomas. This also includes 2-year
+      Associates degree or equivalent.
+      
+      
+      8. "SOME COLLEGE OR UNIVERSITY"
+      
+      Answer with "SOME HIGH SCHOOL" if the patient did some amount of college or
+      university studies, but did *not* finish their degree.
+      
+      
+      9. "BACHELOR"
+      
+      Answer with "BACHELOR" if the patient's highest level of education is
+      an undergraduate degree or equivalent. Examples include: "university",
+      "bachelor", or "college". A mention of a specific field without a qualifying
+      degree should be interpreted as "BACHELOR". Examples include: "psych",
+      "finance", or "biology". These categories can include both art degrees and
+      science degrees.
+      
+      
+      10. "MASTERS"
+      
+      Answer with "MASTERS" if the patient's highest level of education is a master's
+      degree or equivalent. Examples include: "master's", "MSc", "MA", or "MBA".
+      
+      
+      11. "PROFESSIONAL"
+
+      Answer with "PROFESSIONAL" if the patient's highest level of education is a
+      professional degree or equivalent. Examples include: "MD", "JD", and "OD".
+      
+      
+      12. "DOCTORAL"
+
+      Answer with "DOCTORAL" if the patient's highest level of education is a
+      doctoral degree (PhD) or equivalent.
+    
+    
+      13. "UNKNOWN"
+      
+      Answer with "UNKNOWN" if the patient expresses uncertainty about their
+      highest level of education. This can include expressions such as "I 
+      can't remember" or "I don't know". Also answer with "UNKNOWN" if the
+      patient mentions their occupation, but it is impossible to confidently
+      infer their education level from that occupation.
+
+      
+      14. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than their highest
+      level of education.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [25]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00201, UHN00301, UHN00501]
+    parser_data:
+      enum_options:
+        - "NONE"
+        - "SOME GRADE SCHOOL"
+        - "COMPLETED GRADE SCHOOL"
+        - "SOME HIGH SCHOOL"
+        - "COMPLETED HIGH SCHOOL"
+        - "TRADE SCHOOL"
+        - "CERTIFICATE"
+        - "SOME COLLEGE OR UNIVERSITY"
+        - "BACHELOR"
+        - "MASTERS"
+        - "PROFESSIONAL"
+        - "DOCTORAL"
+        - "UNKNOWN"
+        - "IRRELEVANT"
+  Q_25a:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether they
+      completed their education in Canada or in their previous country or country
+      of origin. For each patient, your task is to extract one of the following
+      options based on the most appropriate case.
+
+
+      Options:
+
+      1. "CANADA"
+      
+      Answer with "CANADA" if the patient expresses that they completed their
+      education in Canada.
+      
+      
+      2. "PREVIOUS"
+      
+      Answer with "PREVIOUS" if the patient expresses that they completed their
+      education in their previous country or in their country of origin.
+      
+      
+      3. "UNSURE"
+
+      Answer with "UNSURE" if the patient expresses uncertainty about whether they
+      completed their education in Canada or in their previous country. This can
+      include expressions such as "I can't remember" or "I don't know".
+
+      
+      4. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they
+      completed their education in Canada or in their previous country.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [25a]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00051, UHN00201, UHN00251, UHN00401]
+    parser_data: {enum_options: ["CANADA", "PREVIOUS", "UNSURE", "IRRELEVANT"]}
+  Q_25b:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what their
+      parents' highest level of education is. For each patient, your task is to
+      extract one of the following options based on the most appropriate case.
+      If each of the patient's parents have a different education level, answer
+      based on the parent with the highest education level between the two.
+
+
+      Options:
+
+      1. "NONE"
+
+      Answer with "NONE" if the patient's parents did not attend any education
+      whatsoever.
+
+
+      2. "SOME GRADE SCHOOL"
+
+      Answer with "SOME GRADE SCHOOL" if the patient's parents did some grade school
+      (also known as primary or elementary school), but did *not* finish grade school.
+
+
+      3. "COMPLETED GRADE SCHOOL"
+
+      Answer with "COMPLETED GRADE SCHOOL" if the patient's parents' highest level of
+      completed education is grade school (also known as primary or elementary school).
+
+
+      4. "SOME HIGH SCHOOL"
+
+      Answer with "SOME HIGH SCHOOL" if the patient's parents did some high school
+      (also secondary school), but did *not* finish high school.
+
+
+      5. "COMPLETED HIGH SCHOOL"
+
+      Answer with "COMPLETED HIGH SCHOOL" if the patient's parents' highest level of
+      completed education is high school (also known as secondary school).
+
+
+      6. "TRADE SCHOOL"
+
+      Answer with "TRADE SCHOOL" if the patient's parents' highest level of education is
+      a trade school or vocation school. Examples include: "plumber" or "electrician".
+
+
+      7. "CERTIFICATE"
+
+      Answer with "CERTIFICATE" if the patient's parents completed some sort of
+      Post-Secondary Certificate or Diploma (or equivalent degree). Examples include:
+      Journeyman Certificates or Technical Education Diplomas. This also includes
+      2-year Associates degree or equivalent.
+
+
+      8. "SOME COLLEGE OR UNIVERSITY"
+
+      Answer with "SOME HIGH SCHOOL" if the patient's parents did some amount of
+      college or university studies, but did *not* finish their degree.
+
+
+      9. "BACHELOR"
+
+      Answer with "BACHELOR" if the patient's parents' highest level of education is
+      an undergraduate degree or equivalent. Examples include: "university",
+      "bachelor", or "college". A mention of a specific field without a qualifying
+      degree should be interpreted as "BACHELOR". Examples include: "psych",
+      "finance", or "biology". These categories can include both art degrees and
+      science degrees.
+
+
+      10. "MASTERS"
+
+      Answer with "MASTERS" if the patient's parents' highest level of education 
+      is a master's degree or equivalent. Examples include: "master's", "MSc", 
+      "MA", or "MBA".
+
+
+      11. "PROFESSIONAL"
+
+      Answer with "PROFESSIONAL" if the patient's parents' highest level of education
+      is a professional degree or equivalent. Examples include: "MD", "JD", and "OD".
+
+
+      12. "DOCTORAL"
+
+      Answer with "DOCTORAL" if the patient's parents' highest level of education
+      is a doctoral degree (PhD) or equivalent.
+
+
+      13. "UNKNOWN"
+
+      Answer with "UNKNOWN" if the patient expresses uncertainty about their parents'
+      highest level of education. This can include expressions such as "I can't
+      remember" or "I don't know". Also answer with "UNKNOWN" if the patient mentions
+      their parents' occupations, but it is impossible to confidently infer their
+      education level from those occupations.
+
+
+      14. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than their parents'
+      highest level of education.
+      
+      
+      Additional instructions:
+      
+      Reminder: If the patient's parents each have a different education level,
+      answer with the highest level mentioned.
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [25b]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00251, UHN00301]
+    parser_data:
+      enum_options:
+        - "NONE"
+        - "SOME GRADE SCHOOL"
+        - "COMPLETED GRADE SCHOOL"
+        - "SOME HIGH SCHOOL"
+        - "COMPLETED HIGH SCHOOL"
+        - "TRADE SCHOOL"
+        - "CERTIFICATE"
+        - "SOME COLLEGE OR UNIVERSITY"
+        - "BACHELOR"
+        - "MASTERS"
+        - "PROFESSIONAL"
+        - "DOCTORAL"
+        - "UNKNOWN"
+        - "IRRELEVANT"
+  Q_26:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide a list
+      of their occupation (either current or past if they are retired). For each
+      patient, your task is to extract a list of occupations from the patient's
+      response. Format your answer by separating each listed item with a comma: ",".
+      
+      
+      NOTE: It is possible that the patient talks about something other than their
+      occupation(s). In this case, your answer should be a single word: "IRRELEVANT".
+      
+      
+      NOTE: It is possible that the patient expresses that they never had an
+      occupation (neither currently nor in the past). In this case, your answer
+      should be a single word: "NONE".
+      
+      
+      Output either "IRRELEVANT" or "NONE" or a comma-separated list of occupations.
+      Do not output anything else.
+    question_ids: [26]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00101, UHN00251]
+    parser_data: {"enum_options": [IRRELEVANT, NONE]}
+  Q_26a:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to provide a
+      list of their past occupation (if any) in their previous country or in
+      their country of origin. For each patient, your task is to extract a list
+      of occupations from the patient's response. Format your answer by separating
+      each listed item with a comma: ",".
+      
+      
+      NOTE: It is possible that the patient talks about something other than their
+      occupation(s). In this case, your answer should be a single word: "IRRELEVANT".
+      
+      
+      NOTE: It is possible that the patient expresses that they never had an
+      occupation in their previous country or country of origin. In this case,
+      your answer should be a single word: "NONE".
+      
+      
+      Output either "IRRELEVANT" or "NONE" or a comma-separated list of occupations.
+      Do not output anything else.
+    question_ids: [26a]
+    parser_type: LIST_OR_ENUM
+    few_shot_assign_ids: [UHN0001, UHN00151, UHN00201, UHN00351]
+    parser_data: {"enum_options": [IRRELEVANT, NONE]}
+  Q_27:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient what their
+      religion is. For each patient, your task is to extract and categorize the
+      most appropriate answer from the following options.
+
+
+      Options:
+
+      1. "RELIGION: <value>"
+
+      Answer "RELIGION: <value>" if the patient mentions their specific religion.
+      Fill in the "<value>" in the "RELIGION: <value>" tag with the specific
+      religion mentioned. For example, convert the snippet "I'm Catholic" to
+      "RELIGION: Catholic".
+
+      
+      2. "NONE"
+      
+      Answer with "NONE" if the patient expresses that they have no religion or
+      that they are an atheist.
+      
+      
+      3. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than their religion.
+
+
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above. Remember to fill in
+      the "<value>" in the "RELIGION: <value>" option. Do not output anything else.
+    question_ids: [27]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00251, UHN00301]
+    parser_data:
+      options:
+        - {tag: "RELIGION", repeatable: false, value_sep: ":"}
+        - {tag: "NONE", repeatable: false, value_sep: null}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
+  Q_27a_27b:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to give a 
+      number on a scale of 1 to 5 to describe how religious they are. For each
+      patient, your task is to extract a numerical value from their answer.
+
+      
+      Sometimes the numerical value will be spelled out, like "three". In these
+      cases, convert the value to the equivalent number. For example, convert 
+      "three" to "3".
+      
+      
+      Interpret the patient saying something along the lines of "not very religious"
+      or "not at all" as a score of "1". Interpret the patient saying something along
+      the lines of "somewhat" or "middle amount" as a score of "3". Interpret the
+      patient saying something along the lines of "very religious" or "max" or
+      "conservative" as a score of "5".
+
+      
+      If the patient fails to give a numerical response, answer with "IRRELEVANT".
+      
+      
+      If the patient is undecided between two values, answer with the in between score
+      with ".5" added. For example, convert the snippet "7 or 8" to "7.5".
+
+      
+      To summarize, your answer should be either the single word "IRRELEVANT" or
+      a number between 1 and 5. Do not output anything else.
+    question_ids: [27a, 27b]
+    parser_type: SCORE_OR_REJECT
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00101, UHN00151]
+    system_prompt_index: 2
+    parser_data: {min_score: 1.0, max_score: 5.0, reject: IRRELEVANT}
+  Q_28:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient if they have
+      often been bothered by being feeling down, depressed or hopeless during the
+      past month. This question is taken from the Patient Health Questionnaire
+      (PHQ). For each patient, your task is to extract one of the following
+      options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they have often been
+      bothered by being feeling down, depressed or hopeless during the past month.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses that they have only somewhat
+      been bothered by being feeling down, depressed or hopeless during the past
+      month. This can include expressions such as "sure" or "I guess so".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they have *not* been
+      bothered by being feeling down, depressed or hopeless during the past month.
+
+      
+      4. "UNSURE"
+
+      Answer "UNSURE" if the patient expresses doubt or uncertainty instead of 
+      giving a definitive response.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they
+      have been bothered by being feeling down, depressed or hopeless during the
+      past month.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [28]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00051, UHN00301, UHN00501]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "UNSURE", "IRRELEVANT"]}
+  Q_29:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient if they have
+      often been bothered by little interest or pleasure in doing things during
+      the past month. This question is taken from the Patient Health Questionnaire
+      (PHQ). For each patient, your task is to extract one of the following
+      options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they have often been bothered
+      by little interest or pleasure in doing things during the past month.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses that they have only somewhat
+      been bothered by little interest or pleasure in doing things during the past
+      month. This can include expressions such as "sure" or "I guess so".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they have *not* been bothered
+      by little interest or pleasure in doing things during the past month.
+
+      
+      4. "UNSURE"
+
+      Answer "UNSURE" if the patient expresses doubt or uncertainty instead of 
+      giving a definitive response.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they
+      have been bothered by little interest or pleasure in doing things during
+      the past month.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [29]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00051, UHN00201, UHN00501]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "UNSURE", "IRRELEVANT"]}
+  Q_30:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to give a 
+      number on a scale of 0 to 10 to describe how they felt when they were 
+      first admitted to hospital. For each patient, your task is to extract a
+      numerical value from their answer.
+
+      
+      Sometimes the numerical value will be spelled out, like "three". In these
+      cases, convert the value to the equivalent number. For example, convert 
+      "three" to "3".
+      
+      
+      Interpret the patient saying something along the lines of "not good" or "very 
+      bad" as a score of "0". Interpret the patient saying something along the lines 
+      of "somewhat" or "middle amount" as a score of "5". Interpret the patient saying
+      something along the lines of "very good" or "best" or as a score of "10".
+
+      
+      If the patient fails to give a numerical response, answer with "IRRELEVANT".
+
+
+      If the patient is undecided between two values, answer with the in between score
+      with ".5" added. For example, convert the snippet "7 or 8" to "7.5".
+      
+      
+      To summarize, your answer should be either the single word "IRRELEVANT" or
+      a number between 0 and 10. Do not output anything else.
+    question_ids: [30]
+    parser_type: SCORE_OR_REJECT
+    few_shot_assign_ids: [UHN00051, UHN00101, UHN00151, UHN00301]
+    system_prompt_index: 2
+    parser_data: {min_score: 0.0, max_score: 10.0, reject: IRRELEVANT}
+  Q_31:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to give a 
+      number on a scale of 0 to 10 to describe how they are feeling right now.
+      For each patient, your task is to extract a numerical value from their answer.
+
+      
+      Sometimes the numerical value will be spelled out, like "three". In these
+      cases, convert the value to the equivalent number. For example, convert 
+      "three" to "3".
+      
+      
+      Interpret the patient saying something along the lines of "not good" or "very 
+      bad" as a score of "0". Interpret the patient saying something along the lines 
+      of "somewhat" or "middle amount" as a score of "5". Interpret the patient saying
+      something along the lines of "very good" or "best" or as a score of "10".
+
+      
+      If the patient fails to give a numerical response, answer with "IRRELEVANT".
+      
+      
+      If the patient is undecided between two values, answer with the in between score
+      with ".5" added. For example, convert the snippet "7 or 8" to "7.5".
+
+      
+      To summarize, your answer should be either the single word "IRRELEVANT" or
+      a number between 0 and 10. Do not output anything else.
+    question_ids: [31]
+    parser_type: SCORE_OR_REJECT
+    few_shot_assign_ids: [UHN00101, UHN00251, UHN00401]
+    system_prompt_index: 2
+    parser_data: {min_score: 0.0, max_score: 10.0, reject: IRRELEVANT}
+  Q_32_feel:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient how they feel
+      about being discharged today and whether or not they are ready to go home.
+      For this task, focus on whether the patient *wants* to go home. Do *not*
+      focus on whether the patient is ready to go home. For example, if the patient
+      says "I want to go home, but I'm not ready", focus for this task on the part
+      where the patient says "I want to go home". For each patient, your task is
+      to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they do *want* to go home.
+      
+      
+      2. "UNSURE"
+      
+      Answer with "UNSURE" if the patient expresses that they are unsure whether
+      or not they *want* to go home. This can include expressions such as "maybe"
+      or "I don't know".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* want to go home.
+
+      
+      4. "UNKNOWN"
+
+      Answer with "UNKNOWN" if the patient fails to explicitly mention what they
+      *want* with regards to going home. For example, if the patient only discusses
+      whether they are *ready* to go home, but not whether they *want* to go home.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they
+      *want* to go home.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["32", "32a"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00051, UHN00101, UHN00301]
+    parser_data: {enum_options: ["YES", "UNSURE", "NO", "UNKNOWN", "IRRELEVANT"]}
+  Q_32_ready:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient how they feel
+      about being discharged today and whether or not they are ready to go home.
+      For this task, focus on whether the patient is *ready* to go home. Do *not*
+      focus on whether the patient wants to go home. For example, if the patient
+      says "I want to go home, but I'm not ready", focus for this task on the part
+      where the patient says "I'm not ready". For each patient, your task is
+      to extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they are *ready* to go home.
+      
+      
+      2. "UNSURE"
+      
+      Answer with "UNSURE" if the patient expresses that they are unsure whether
+      or not they are *ready* to go home. This can include expressions such as
+      "maybe" or "I don't know".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they are *not* ready to go home.
+
+      
+      4. "UNKNOWN"
+
+      Answer with "UNKNOWN" if the patient fails to explicitly mention what they
+      are *ready* to be going home. For example, if the patient only discusses
+      whether they *want* to go home, but not whether they are *ready* to go home.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they
+      are *ready* to go home.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["32", "32a"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN00051, UHN00101, UHN00451]
+    parser_data: {enum_options: ["YES", "UNSURE", "NO", "UNKNOWN", "IRRELEVANT"]}
+  Q_32_tension:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient how they feel
+      about being discharged today and whether or not they are ready to go home.
+      For this task, focus on whether or not there is any tension expressed in
+      the patient's response. For each patient, your task is to extract one of
+      the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "INTERNAL TENSION"
+      
+      Answer with "INTERNAL TENSION" if the patient expresses some tension that
+      is internal to them and their feelings. For example, convert the snippet
+      "I want to go home, but I'm not ready" to "INTERNAL TENSION", because there
+      is internal tension between what the patient wants and how ready they feel. 
+      
+      
+      2. "WAITING ON CLINICIANS"
+      
+      Answer with "WAITING ON CLINICIANS" if the patient expresses some tension
+      arising from having to wait on the clinical team. For example, convert the
+      snippet "I  want to go home, but I won't until the doctors say I can" to
+      "WAITING ON CLINICIANS", because the patient is waiting on the clinical team.
+      This can also be expressed waiting on other hospital staff, or on the
+      hospital as a whole.
+      
+      
+      3. "OTHER TENSION"
+
+      Answer with "OTHER TENSION" if the patient expresses some other form of tension
+      that is neither internal to themselves ("INTERNAL TENSION") nor based on waiting
+      for the clinical team ("WAITING ON CLINICIANS").
+
+      
+      4. "NO TENSION"
+
+      Answer "NO TENSION" if the patient do not express any tension in their response.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than how they feel
+      about being discharged today and whether or not they are ready to go home.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: ["32", "32a"]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00101, UHN00201, UHN00301]
+    parser_data:
+      enum_options:
+        - "INTERNAL TENSION"
+        - "WAITING ON CLINICIANS"
+        - "OTHER TENSION"
+        - "NO TENSION"
+        - "IRRELEVANT"
+  Q_33:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to give a 
+      number on a scale of 0 to 10 to describe how much they feel their condition
+      has stabilized or improved since being admitted to hospital. For each
+      patient, your task is to extract a numerical value from their answer.
+
+      
+      Sometimes the numerical value will be spelled out, like "three". In these
+      cases, convert the value to the equivalent number. For example, convert 
+      "three" to "3".
+      
+      
+      Interpret the patient saying something along the lines of "not good" or "very 
+      bad" as a score of "0". Interpret the patient saying something along the lines 
+      of "somewhat" or "middle amount" as a score of "5". Interpret the patient saying
+      something along the lines of "very good" or "best" or as a score of "10".
+
+      
+      If the patient fails to give a numerical response, answer with "IRRELEVANT".
+      
+      
+      If the patient is undecided between two values, answer with the in between score
+      with ".5" added. For example, convert the snippet "7 or 8" to "7.5".
+
+      
+      To summarize, your answer should be either the single word "IRRELEVANT" or
+      a number between 0 and 10. Do not output anything else.
+    question_ids: [33]
+    parser_type: SCORE_OR_REJECT
+    few_shot_assign_ids: [UHN00051, UHN00101, UHN00201, UHN00301]
+    system_prompt_index: 2
+    parser_data: {min_score: 0.0, max_score: 10.0, reject: IRRELEVANT}
+  Q_34:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient to describe
+      how far they can walk. For each patient, your task is to extract one of
+      the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "NOT AT ALL"
+      
+      Answer with "NOT AT ALL" if the patient expresses that they cannot walk at all.
+      
+      
+      2. "NOT FAR"
+      
+      Answer with "NOT FAR" if the patient expresses that they can walk a bit, but
+      not far. This can include expressions such as "a few meters", "to the end of
+      the hall", or "only inside the hospital".
+      
+      
+      3. "FAR"
+
+      Answer with "FAR" if the patient expresses that they can walk quite far. For
+      example, if the patient can walk at least one city block, at least 1km, or
+      at least 30 minutes.
+
+      
+      4. "UNKNOWN"
+      
+      Answer with "UNKNOWN" if the patient expresses that they do not known how far
+      they can walk. This can include expressions such as "I haven't tried" or "I've
+      been in bed the whole time."
+      
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's question
+      because they are talking about something other than how far they can walk.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [34]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00101, UHN00101]
+    parser_data:
+      enum_options: ["NOT AT ALL", "NOT FAR", "FAR", "UNKNOWN", "IRRELEVANT"]
+  Q_35:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not 
+      they feel they need support to manage their heart failure at home. For each 
+      patient,  your task is to extract one of the following options based on the
+      most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they *do* feel they need
+      support to manage their heart failure at home.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses that they feel they only
+      *somewhat* need support to manage their heart failure at home. This can
+      include expressions such as "maybe" or "sometimes".
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* feel they
+      need support to manage their heart failure at home.
+
+      
+      4. "UNSURE"
+
+      Answer "UNSURE" if the patient expresses doubt or uncertainty instead of 
+      giving a definitive response.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they 
+      feel they need support to manage their heart failure at home.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [35]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00351, UHN00451]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "UNSURE", "IRRELEVANT"]}
+  Q_35a:
+    prompt: >-
+      In the snippet below, the interviewer is asking each patient whether or not they 
+      have support for managing their heart failure. For each patient, your task is to 
+      extract one of the following options based on the most appropriate case.
+
+
+      Options:
+
+      1. "YES"
+      
+      Answer with "YES" if the patient expresses that they *do* have support for 
+      managing their heart failure. It does not matter who the support is from
+      (e.g., family, friend, doctor, nurse practitioner, etc), so long as the
+      patient affirmatively states that they *do* have support.
+      
+      
+      2. "SOMEWHAT"
+      
+      Answer with "SOMEWHAT" if the patient expresses that they only somewhat have
+      support for managing their heart failure. This can include expressions such 
+      as "maybe" or "sometimes". It does not matter who the support is from (e.g.,
+      family, friend, doctor, nurse practitioner, etc), so long as the patient
+      affirmatively states that they *somewhat* have support.
+      
+      
+      3. "NO"
+
+      Answer with "NO" if the patient expresses that they do *not* have support
+      for managing their heart failure.
+
+      
+      4. "UNSURE"
+
+      Answer "UNSURE" if the patient expresses doubt or uncertainty instead of 
+      giving a definitive response.
+
+      
+      5. "IRRELEVANT"
+      
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they
+      have support for managing their heart failure.
+      
+      
+      Additional instructions:
+      
+      Answer with the most appropriate of the options listed above.
+      Do not output anything else.
+    question_ids: [35a]
+    parser_type: ENUM
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00201]
+    parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "UNSURE", "IRRELEVANT"]}
+  Q_36:
+    prompt: >-      
+      In the snippet below, the interviewer is asking each patient what their fears
+      right now regarding their health are. For each patient, your task  is to convert 
+      the patient's response into or or more of the following options based on the most
+      appropriate case.
+
+
+      Options:
+
+      1. "DYING"
+
+      Answer "DYING" if the patient fears dying.
+
+
+      2. "FUNCTION"
+
+      Answer "FUNCTION" if the patient fears losing function in their day-to-day
+      life and activities, such as going for a walk, doing daily tasks like, or
+      doing activities with their family or friends.
+
+
+      3. "PROGRESSION"
+      
+      Answer "PROGRESSION" if the patient fears a worsening of their cardiac
+      problems or a progression of their cardiac condition. 
+      
+      
+      4. "NO FEAR"
+      
+      Answer "NO FEAR" if the patient expresses that they have no fears regarding
+      their health.
+      
+      
+      5. "OTHER: <fear>"
+
+      Answer "OTHER: <fear>" if the patient mentions some other fear that does not
+      fit in neatly with the above options. Fill in the "<fear>" with a short
+      (1-10 word) descriptive summary of the fear the patient gives. If the patient
+      gives more than one fear, separate each reason with a comma to create a
+      comma-separated list of fear, such as "OTHER: fear #1, fear #2".
+
+
+      6. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than whether they
+      have support for managing their heart failure.
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I am afraid of dying, but also
+      afraid that I can longer participate in activities with my family" to:
+      
+      "DYING
+      
+      FUNCTION"
+      
+      
+      CAUTION: Even though multiple options can be appropriate at the same time,
+      each individual option should only appear once (when the case is appropriate).
+      Do not output anything else.
+    question_ids: [36]
+    parser_type: MULTI_TAG
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00151, UHN00351]
+    parser_data:
+      options:
+        - {tag: "DYING", repeatable: false, value_sep: null}
+        - {tag: "FUNCTION", repeatable: false, value_sep: null}
+        - {tag: "PROGRESSION", repeatable: false, value_sep: null}
+        - {tag: "NO FEAR", repeatable: false, value_sep: null}
+        - {tag: "OTHER", repeatable: false, value_sep: ":"}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}

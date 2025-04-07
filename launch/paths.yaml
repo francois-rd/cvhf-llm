@@ -1,0 +1,19 @@
+root_dir: ../data
+resources_dir: ${root_dir}/resources
+master_file: ${resources_dir}/master_file.csv
+transcript_dir: ${resources_dir}/transcripts-ocr
+docx_transcript_dir: ${transcript_dir}/docx
+json_transcript_dir: ${transcript_dir}/json
+clustered_transcript_dir: ${transcript_dir}/clustered
+labeled_transcript_dir: ${transcript_dir}/labeled
+results_dir: ${root_dir}/results
+extraction_dir: ${results_dir}/extraction
+validation_dir: ${results_dir}/validation
+parsed_labels_dir: ${validation_dir}/parsed_labels
+aggregate_scores_dir: ${validation_dir}/aggregate_scores
+consolidate_dir: ${results_dir}/consolidate
+analysis_dir: ${results_dir}/analysis
+run_dir: ${extraction_dir}/${run_id}
+
+# The nickname or ID of the current run. Update this at runtime on the command line.
+run_id: <missing-run-id>
