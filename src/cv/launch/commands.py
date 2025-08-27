@@ -6,6 +6,7 @@ import os
 
 import coma
 import pandas as pd
+from tqdm import tqdm
 
 from .base import Configs as Cfgs, init
 
@@ -125,7 +126,7 @@ class ExtractCommand:
 
     def run(self):
         root = self.paths.clustered_transcript_dir
-        for transcript, walk in walk_dataclass_json(root, t=Transcript):
+        for transcript, walk in tqdm(list(walk_dataclass_json(root, t=Transcript))):
             output_file = self.make_output_file(self.llms.llm, walk, ext=".jsonl")
             if self.rerun_protocol.skip(output_file):
                 continue
