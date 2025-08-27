@@ -114,11 +114,14 @@ class EnumParser(OutputParser):
 class Tag:
     """Output of a TagParser."""
 
-    # The string name of this tag.
+    # The string name of this tag. Always uppercase, even if parser has re.IGNORECASE.
     tag: str
 
     # The optional value attached to this tag.
     value: Optional[str]
+
+    def __post_init__(self):
+        self.tag = self.tag.upper()
 
     def to_string(self, sep: str = ": ") -> str:
         if self.value is None:
