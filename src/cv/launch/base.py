@@ -6,7 +6,7 @@ import coma
 from ..consolidate import ConsolidateConfig
 from ..core import ClustersConfig
 from ..io import PathConfig, logging as log
-from ..llms import DummyConfig, LLMsConfig, TransformersConfig
+from ..llms import DummyConfig, LLMsConfig, OpenAIConfig, TransformersConfig
 from ..segmentation import TagsConfig
 from ..validation import ValidationConfig
 
@@ -22,6 +22,7 @@ class Configs:
     clusters = ConfigData("clusters", ClustersConfig)
     dummy = ConfigData("dummy", DummyConfig)
     llms = ConfigData("llms", LLMsConfig)
+    openai = ConfigData("openai", OpenAIConfig)
     paths = ConfigData("paths", PathConfig)
     tags = ConfigData("tags", TagsConfig)
     transformers = ConfigData("transformers", TransformersConfig)

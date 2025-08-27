@@ -14,6 +14,7 @@ class LLMImplementation(Enum):
     MISSING = "MISSING"
     DUMMY = "DUMMY"
     HF_TRANSFORMERS = "HF_TRANSFORMERS"
+    OPENAI = "OPENAI"
 
 
 @dataclass

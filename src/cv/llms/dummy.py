@@ -18,6 +18,9 @@ class DummyLLM(LLM):
 
     def invoke(self, prompt: ClusterPrompt, *args, **kwargs) -> LLMOutput:
         if self.cfg.cheat:
-            label = self.sampler.get(prompt.name, kwargs["assign_id"]).label
+            try:
+                label = self.sampler.get(prompt.name, kwargs["assign_id"]).label
+            except ValueError:
+                label = None
             return LLMOutput(generated_text=label or "", error_message=None)
         return LLMOutput(generated_text=self.cfg.dummy_output, error_message=None)

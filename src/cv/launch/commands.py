@@ -19,6 +19,7 @@ from ..llms import (
     LLMImplementation,
     LLMsConfig,
     MISSING_NICKNAME,
+    OpenAIConfig,
     TransformersConfig,
 )
 from ..io import (
@@ -89,7 +90,11 @@ class ReferenceDate:
         df = pd.read_csv(paths.master_file, index_col=False)
         data = df[["assigned_id", "date_interview"]].to_dict()
         data = dict(zip(data["assigned_id"].values(), data["date_interview"].values()))
-        self.data = {a_id: date.fromisoformat(d) for a_id, d in data.items()}
+        self.data = {}
+        for a_id, d in data.items():
+            if isinstance(d, float):
+                continue
+            self.data[a_id.split("_")[0]] = date.fromisoformat(d)
 
     def get(self, assign_id: str) -> date:
         return self.data[assign_id]
@@ -101,7 +106,7 @@ class ExtractCommand:
         paths: PathConfig,
         clusters: ClustersConfig,
         llms: LLMsConfig,
-        llm_impl_cfg: Union[DummyConfig, TransformersConfig],
+        llm_impl_cfg: Union[DummyConfig, OpenAIConfig, TransformersConfig],
         rerun_protocol: RerunProtocol,
     ):
         self.paths, self.clusters, self.llms = paths, clusters, llms
@@ -125,12 +130,12 @@ class ExtractCommand:
             if self.rerun_protocol.skip(output_file):
                 continue
             a_id = self.pathing.get_assign_id(walk)
-            extractions = self.do_extract(
-                transcript,
-                reference_date=self.get_reference(a_id),
-                assign_id=a_id,
-            )
-            save_dataclass_jsonl(output_file, *extractions)
+            try:
+                ref = self.get_reference(a_id)
+            except KeyError:
+                continue
+            extracts = self.do_extract(transcript, reference_date=ref, assign_id=a_id)
+            save_dataclass_jsonl(output_file, *extracts)
 
 
 def parse_labels(paths: PathConfig, clusters: ClustersConfig):
@@ -138,7 +143,10 @@ def parse_labels(paths: PathConfig, clusters: ClustersConfig):
     get_reference = ReferenceDate(paths).get
     for label_data, walk in walk_json(paths.labeled_transcript_dir):
         a_id = walk.no_ext()
-        reference = get_reference(a_id)
+        try:
+            reference = get_reference(a_id)
+        except KeyError:
+            continue
         parsed_labels = parser(a_id, label_data, reference_date=reference)
         output_file = walk.map(paths.parsed_labels_dir, ext=".jsonl")
         save_dataclass_jsonl(output_file, *parsed_labels)
@@ -159,6 +167,9 @@ def mini_validation(
     compare = GroundTruthComparator(clusters)
     for data, walk in pathing.walk_extractions():
         a_id = pathing.get_assign_id(walk)
+        if a_id not in labels_by_aid:
+            # Skip all extractions for which we don't have manual labels.
+            continue
         run_id, llm = pathing.get_run_id_and_llm(walk)
         if run_id not in validation.run_ids_to_include:
             continue
@@ -235,20 +246,27 @@ def register():
         )(unknown_args=unknown_args, configs=llm_cfg)
         cfg: LLMsConfig = llm_cfg[Cfgs.llms.id_]
 
-        # Add the right LLM config to 'configs' (in place).
+        # Remove the configs we don't want (in place). Since we are using a positional
+        # init hook, the remaining config will end up in third position, which is
+        # "llm_impl_cfg" in ExtractCommand. Yes, this is very confusing and Coma>3 does
+        # this much more cleanly, but that is not available on DSH.
         if cfg.llm == MISSING_NICKNAME:
             raise ValueError(f"Missing runtime LLM: {cfg.llm}")
         if cfg.implementation == LLMImplementation.MISSING:
             raise ValueError(f"Missing implementation type for LLM: {cfg.llm}")
         elif cfg.implementation == LLMImplementation.DUMMY:
-            llm_impl = Cfgs.dummy
+            del configs[Cfgs.openai.id_]
+            del configs[Cfgs.transformers.id_]
+        elif cfg.implementation == LLMImplementation.OPENAI:
+            del configs[Cfgs.dummy.id_]
+            del configs[Cfgs.transformers.id_]
         elif cfg.implementation == LLMImplementation.HF_TRANSFORMERS:
-            llm_impl = Cfgs.transformers
+            del configs[Cfgs.dummy.id_]
+            del configs[Cfgs.openai.id_]
         else:
             raise ValueError(
                 f"Unsupported LLM implementation type: {cfg.implementation}",
             )
-        configs[llm_impl.id_] = llm_impl.type_
 
     rerun_parser_hook = coma.hooks.parser_hook.factory(
         "-p",
@@ -269,7 +287,14 @@ def register():
         parser_hook=rerun_parser_hook,
         pre_config_hook=extract_pre_config_hook,
         pre_init_hook=rerun_pre_init_hook,
-        **Cfgs.add(Cfgs.paths, Cfgs.clusters, Cfgs.llms),
+        **Cfgs.add(
+            Cfgs.paths,
+            Cfgs.clusters,
+            Cfgs.llms,
+            Cfgs.dummy,
+            Cfgs.openai,
+            Cfgs.transformers,
+        ),
     )
 
     coma.register("parse.labels", parse_labels, **Cfgs.add(Cfgs.paths, Cfgs.clusters))

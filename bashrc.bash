@@ -31,3 +31,25 @@ segment
 test.comp
 test.launch
 " launch
+
+
+launch-extract-dummy () {
+  pushd "$DEFAULT_CONFIG_DIR" > /dev/null || exit
+  bash extract_dummy.bash "$@"
+  popd > /dev/null || exit
+}
+export -f launch-extract-dummy
+
+launch-extract-openai () {
+  pushd "$DEFAULT_CONFIG_DIR" > /dev/null || exit
+  bash extract_openai.bash "$@"
+  popd > /dev/null || exit
+}
+export -f launch-extract-openai
+
+launch-extract-transformer () {
+  pushd "$DEFAULT_CONFIG_DIR" > /dev/null || exit
+  bash extract_transformers.bash "$@"
+  popd > /dev/null || exit
+}
+export -f launch-extract-transformer

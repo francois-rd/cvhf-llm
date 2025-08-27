@@ -1,5 +1,6 @@
 from .base import LLM, LLMsConfig, LLMImplementation, MISSING_NICKNAME
 from .dummy import DummyLLM
+from .openai import OpenAILLM
 from .transformers import TransformersLLM
 
 
@@ -10,6 +11,8 @@ def load_llm(cfg: LLMsConfig, *args, **kwargs) -> LLM:
         raise ValueError(f"Missing implementation type for LLM: {cfg.llm}")
     elif cfg.implementation == LLMImplementation.DUMMY:
         return DummyLLM(cfg.llm, *args, **kwargs)
+    elif cfg.implementation == LLMImplementation.OPENAI:
+        return OpenAILLM(cfg.llm, *args, **kwargs)
     elif cfg.implementation == LLMImplementation.HF_TRANSFORMERS:
         return TransformersLLM(cfg.llm, *args, **kwargs)
     else:
