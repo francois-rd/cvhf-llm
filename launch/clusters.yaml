@@ -279,7 +279,7 @@ clusters:
       Do not output anything else.
     question_ids: [6]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN00251, UHN00401, UHN00501]
+    few_shot_assign_ids: [UHN00051, UHN00251, UHN00501]
     parser_data:
       enum_options:
         - "BETTER: YES"
@@ -1043,7 +1043,7 @@ clusters:
       Do not output anything else.
     question_ids: [13]
     parser_type: MULTI_TAG
-    few_shot_assign_ids: [UHN00351, UHN00401, UHN00501]
+    few_shot_assign_ids: [UHN00051, UHN00351, UHN00501]
     parser_data:
       options:
         - {tag: "HOSPITAL", repeatable: true, value_sep: ":"}
@@ -1478,7 +1478,7 @@ clusters:
       Do not output anything else.
     question_ids: ["16e", "16e2"]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN0001, UHN00251, UHN00401]
+    few_shot_assign_ids: [UHN0001, UHN00251]
     parser_data: {enum_options: ["YES", "SOMEWHAT", "NO", "IRRELEVANT"]}
   Q_16e3:
     prompt: >-
@@ -1575,7 +1575,7 @@ clusters:
       list of the options above (general case). Do not output anything else.
     question_ids: [17]
     parser_type: LIST_OF_ENUMS
-    few_shot_assign_ids: [UHN00051, UHN00401, UHN00501]
+    few_shot_assign_ids: [UHN00051, UHN0001, UHN00451, UHN00501]
     parser_data:
       enum_options:
         - INTERNET
@@ -1627,7 +1627,7 @@ clusters:
       anything else.
     question_ids: [18]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN0001, UHN00051, UHN00401]
+    few_shot_assign_ids: [UHN0001, UHN00051, UHN00201]
     parser_data:
       enum_options:
         - INTERNET
@@ -1679,7 +1679,7 @@ clusters:
       Do not output anything else.
     question_ids: [19]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN00401, UHN00051, UHN00451, UHN00301]
+    few_shot_assign_ids: [UHN00051, UHN00451, UHN00301]
     parser_data: {enum_options: ["YES", "UNSURE", "NO", "IRRELEVANT"]}
   Q_19a:
     prompt: >-
@@ -1712,7 +1712,7 @@ clusters:
       Do not output anything else.
     question_ids: [19a]
     parser_type: LIST_OR_ENUM
-    few_shot_assign_ids: [UHN0001, UHN00201, UHN00351, UHN00401]
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00351]
     parser_data: {"enum_options": ["IRRELEVANT", "NO DETAILS"]}
   Q_19b:
     prompt: >-
@@ -1880,7 +1880,7 @@ clusters:
       Do not output anything else.
     question_ids: [19c]
     parser_type: MULTI_TAG
-    few_shot_assign_ids: [UHN00151, UHN00201, UHN00301, UHN00351, UHN00451]
+    few_shot_assign_ids: [UHN00151, UHN00201, UHN00101, UHN00351, UHN00451]
     parser_data:
       options:
         - {tag: "BETTER", repeatable: true, value_sep: ":"}
@@ -2465,7 +2465,7 @@ clusters:
       Do not output anything else.
     question_ids: [25a]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN00051, UHN00201, UHN00251, UHN00401]
+    few_shot_assign_ids: [UHN00051, UHN00201, UHN00251, UHN00151]
     parser_data: {enum_options: ["CANADA", "PREVIOUS", "UNSURE", "IRRELEVANT"]}
   Q_25b:
     prompt: >-
@@ -2886,7 +2886,7 @@ clusters:
       a number between 0 and 10. Do not output anything else.
     question_ids: [31]
     parser_type: SCORE_OR_REJECT
-    few_shot_assign_ids: [UHN00101, UHN00251, UHN00401]
+    few_shot_assign_ids: [UHN00101, UHN00251, UHN00451]
     system_prompt_index: 2
     parser_data: {min_score: 0.0, max_score: 10.0, reject: IRRELEVANT}
   Q_32_feel:
@@ -2939,7 +2939,7 @@ clusters:
       Do not output anything else.
     question_ids: ["32", "32a"]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN00051, UHN00101, UHN00301]
+    few_shot_assign_ids: [UHN00051, UHN00301]
     parser_data: {enum_options: ["YES", "UNSURE", "NO", "UNKNOWN", "IRRELEVANT"]}
   Q_32_ready:
     prompt: >-
@@ -2991,7 +2991,7 @@ clusters:
       Do not output anything else.
     question_ids: ["32", "32a"]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN00051, UHN00101, UHN00451]
+    few_shot_assign_ids: [UHN00051, UHN00151, UHN00451]
     parser_data: {enum_options: ["YES", "UNSURE", "NO", "UNKNOWN", "IRRELEVANT"]}
   Q_32_tension:
     prompt: >-
@@ -3047,7 +3047,7 @@ clusters:
       Do not output anything else.
     question_ids: ["32", "32a"]
     parser_type: ENUM
-    few_shot_assign_ids: [UHN0001, UHN00101, UHN00201, UHN00301]
+    few_shot_assign_ids: [UHN0001, UHN00201, UHN00301]
     parser_data:
       enum_options:
         - "INTERNAL TENSION"
