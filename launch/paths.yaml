@@ -1,7 +1,7 @@
 root_dir: ../data
 resources_dir: ${root_dir}/resources
 master_file: ${resources_dir}/master_file.csv
-transcript_dir: ${resources_dir}/transcripts-ocr
+transcript_dir: ${resources_dir}/transcripts
 docx_transcript_dir: ${transcript_dir}/docx
 json_transcript_dir: ${transcript_dir}/json
 clustered_transcript_dir: ${transcript_dir}/clustered
