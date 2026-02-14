@@ -3,14 +3,32 @@ system_prompt_options:
     You are a helpful medical assistant. Your task is to extract and
     categorize patient responses from snippets of a transcript between an
     interviewer and a medical patient.
+    
+    Editorialize as needed to fit the patient's output to fit the format described
+    below. Provide an answer directly, without any addendum, notes, parenthetical
+    comments or other additional output that makes it harder to parse your answer.
+    In other words, do NOT justify your response with any additional output text as
+    doing so makes it very difficult to parse out the response from the justification.
   - >-
     You are a helpful medical assistant. Your task is to extract patient
     responses from snippets of a transcript between an interviewer and a medical
     patient and convert to the extraction into a canonical form.
+    
+    Editorialize as needed to fit the patient's output to fit the format described
+    below. Provide an answer directly, without any addendum, notes, parenthetical
+    comments or other additional output that makes it harder to parse your answer.
+    In other words, do NOT justify your response with any additional output text as
+    doing so makes it very difficult to parse out the response from the justification.
   - >-
     You are a helpful medical assistant. Your task is to extract and score patient 
     responses from snippets of a transcript between an interviewer and a medical 
     patient.
+    
+    Editorialize as needed to fit the patient's output to fit the format described
+    below. Provide an answer directly, without any addendum, notes, parenthetical
+    comments or other additional output that makes it harder to parse your answer.
+    In other words, do NOT justify your response with any additional output text as
+    doing so makes it very difficult to parse out the response from the justification.
 instruction_prompt_to_sample_delimiter: "\n\n"
 sample_template: "*Snippet of transcript*\n{transcript}\n\n*Answer*"
 included_clusters:
@@ -87,60 +105,1003 @@ clusters:
       In the snippet below, the interviewer is asking each patient to provide a 
       list of symptoms they are or have recently been experiencing that brought 
       them into the hospital for this current admission. For each patient, your 
-      task is to extract a list of symptoms from the patient's response. Format 
-      your answer by separating each listed symptom with a comma ",". It is 
-      possible that the patient talks about something other than their symptoms. 
-      In this case, your answer should be a single word: "IRRELEVANT".
+      task is to extract specific symptoms or diagnoses from the patient's response
+      into one or more of the following options based on the most appropriate case(s).
+
+
+      Options:
+
+      1. "SHORTNESS OF BREATH"
+
+      Answer "SHORTNESS OF BREATH" if the patient is experiencing shortness of breath.
+      The following (non-exhaustive) list are all expressions of shortness of breath:
+      short of breath, shortage of breath, water in lungs, congestion, low oxygen,
+      out of breath, can't breathe, breathing difficulty, wheezing, panting, labored
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "SHORTNESS OF BREATH".
+
+
+      2. "FLUID RETENTION"
+
+      Answer "FLUID RETENTION" if the patient is experiencing fluid retention. The
+      following (non-exhaustive) list are all expressions of fluid retention: ascites,
+      distention, stomach full, stomach discomfort, bloated abdomen, sharp pain in
+      belly, edema, swelling, swelling legs, overweight, rapid weight gain, gained many
+      pounds, fluid maintenance, etc. If the patient's response is exactly or similar
+      to these expressions (including paraphrases), answer with "FLUID RETENTION".
+
+
+      3. "FATIGUE"
+
+      Answer "FATIGUE" if the patient is experiencing fatigue. The following
+      (non-exhaustive) list are all expressions of fatigue: weak, tired, exhausted, low
+      strength, low energy, inability to walk, not feeling well, feeling sick, can't
+      carry a lot of weight, can't complete daily activities, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "FATIGUE".
+
+
+      4. "HEART FAILURE"
+
+      Answer "HEART FAILURE" if the patient mentions a heart failure diagnosis. The
+      following (non-exhaustive) list are all expressions of a heart failure diagnosis:
+      heart failure, congestive heart failure, weak heart, poor heart function, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "HEART FAILURE".
+      
+
+      5. "DIZZINESS"
+
+      Answer "DIZZINESS" if the patient is experiencing dizziness or syncope. The
+      following (non-exhaustive) list are all expressions of dizziness or syncope:
+      dizziness, fainting, syncope, passed out, feeling like I'm going to pass out,
+      collapsed, light headed, vertigo, loss of balance, etc. If the patient's response
+      is exactly or similar to these expressions (including paraphrases), answer with
+      "DIZZINESS".
+      
+
+      6. "MYOCARDIAL INFARCTION"
+
+      Answer "MYOCARDIAL INFARCTION" if the patient mentions a myocardial infarction
+      diagnosis or related symptoms. The following (non-exhaustive) list are all
+      expressions of a myocardial infarction diagnosis or related symptoms: heart
+      attack, heart pressure, heart pain, angina, chest pain, chest discomfort, chest
+      pressure, chest tightness, heaviness, something sitting on my chest, pain when
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "MYOCARDIAL INFARCTION".
+      
+
+      7. "PALPITATIONS"
+
+      Answer "PALPITATIONS" if the patient is experiencing palpitations. The following
+      (non-exhaustive) list are all expressions of palpitations: heart racing, rapid
+      heart rate, high pulse, heart pumping too much, heart pumping very fast, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "PALPITATIONS".
+      
+
+      8. "BLOOD PRESSURE"
+
+      Answer "BLOOD PRESSURE" if the patient mentions a blood pressure diagnosis. The
+      following (non-exhaustive) list are all expressions of a blood pressure diagnosis:
+      high blood pressure, low blood pressure, blood pressure, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "BLOOD PRESSURE".
+      
+
+      9. "CARDIAC: <symptom/diagnosis>"
+
+      Answer "CARDIAC: <symptom/diagnosis>" if the patient mentions some other cardiac
+      symptom or diagnosis that does not fit into the more specific above options. Fill
+      in the "<symptom/diagnosis>" tag with a short (1-5 word) descriptive summary of
+      the symptom or diagnosis. The following (non-exhaustive) list are all expressions
+      of other cardiac symptoms or diagnoses: angioplasty, malfunctioning pacemaker,
+      arrhythmia, heart flutters, bad heart valve, leaking valve, valvular disease,
+      mitral valve prolapse, aortic valve calcification, aortic valve anomaly, valve
+      replacement, valve regurgitation, vad (ventricular artery disease), blockages,
+      blocked arteries, left bundle branch block, afib (atrial fibrillation), cardiac
+      arrest, bradycardia, hypertrophic cardiomyopathy, vt (ventricular tachycardia),
+      shock from defibrillator, icd shock, ipf (idiopathic pulmonary fibrosis), heart
+      problems, heart conditions, heart issues, etc. Use appropriate medical terminology
+      to paraphrase the patient where possible. For example, if the patient expresses
+      having "bad heart rhythm", answer with "CARDIAC: arrhythmia". 
+
+
+      10. "NEUROLOGIC ISSUES"
+
+      Answer "NEUROLOGIC ISSUES" if the patient is experiencing neurologic issues.
+      The following (non-exhaustive) list are all expressions of neurologic issues:
+      confusion, loss of memory, disorientation upon waking up, slurred speech, stroke,
+      loss of use in right leg, loss of use in right arm, left arm numbness, cramping
+      of the feet, sharp pains in heel, hot water sensation on foot, stabbing feeling,
+      sharp/lightning bolts, very uncomfortable, tingling in fingers tingling in jaws,
+      equilibrium off, restlessness, restless leg syndrome, hand shaking, headache, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "NEUROLOGIC ISSUES".
+      
+
+      11. "INFECTION RELATED"
+
+      Answer "INFECTION RELATED" if the patient is experiencing infection related
+      issues. The following (non-exhaustive) list are all expressions of infection
+      related issues: big sores with lots of pus, blisters all over legs, infection in
+      legs, swelling in a wound in the leg, open wound on toe, blood poisoning, blood
+      infection, lung infection, kidney infection, antibiotics, abscessed tooth, flu,
+      strep throat, nose dripping, sinus cold, sneezing, fever, releasing mucus, phlegm,
+      swollen lymph nodes, pneumonia, covid, covid vaccine, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "INFECTION RELATED".
+      
+
+      12. "ENT ISSUES"
+
+      Answer "ENT ISSUES" if the patient is experiencing ENT (ear, nose, throat) issues.
+      The following (non-exhaustive) list are all expressions of ENT issues: head upset,
+      ringing in ears, ear bleeding, pressure across the neck, throat constriction,
+      throat swelling, feeling of a big rock on throat, fatigue in the throat, itchy
+      throat, hoarse voice, losing my voice, tongue numbness, thyroid issue, ear issue,
+      neck cancer, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "ENT ISSUES".
+
+
+      13. "GI ISSUES"
+
+      Answer "GI ISSUES" if the patient is experiencing GI (gastrointestinal) issues.
+      The following (non-exhaustive) list are all expressions of GI issues: anorexia,
+      vomiting, lost appetite, nausea, increased appetite, lost taste buds, excessive
+      saliva, dry mouth, GERD, heart burn, acid reflux, esophagitis, indigestion,
+      digestion issues, dry heaves, gastroenteritis, epigastric concerns, milk allergy,
+      gluten allergy, constipation, difficulty having bowel movements, diarrhea, stomach
+      pain, intestinal pain, burping, belching, a lot of gas, flatulating, something in
+      my gallbladder, gallstone, food poisoning, liver issues, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "GI ISSUES".
+
+
+      14. "UROLOGICAL/GYNECOLOGICAL ISSUES"
+
+      Answer "UROLOGICAL/GYNECOLOGICAL ISSUES" if the patient is experiencing urological
+      or gynecological issues. The following (non-exhaustive) list are all expressions
+      of urological or gynecological issues: prostate issues, menstrual discomfort,
+      kidney stones, kidney issues, inability to urinate, incontinence, using catheter,
+      etc. If the patient's response is exactly or similar to these expressions
+      (including paraphrases), answer with "UROLOGICAL/GYNECOLOGICAL ISSUES".
+      
+
+      15. "ELECTROLYTE ISSUES"
+
+      Answer "ELECTROLYTE ISSUES" if the patient is experiencing electrolyte issues.
+      The following (non-exhaustive) list are all expressions of electrolyte issues:
+      low potassium, high potassium, low sodium, high sodium, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "ELECTROLYTE ISSUES".
       
       
-      Output either "IRRELEVANT" or a comma-separated list of symptoms.
-      Do not output anything else.
+      16. "ORTHOPNEA"
+
+      Answer "ORTHOPNEA" if the patient is experiencing orthopnea. The following
+      (non-exhaustive) list are all expressions of orthopnea: difficulty sleeping,
+      can't sleep, insomnia, prolonged time to fall asleep, can't sleep while lying
+      down, inability to lie down, waking up gasping, unrest, sleep disturbance, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "ORTHOPNEA".
+      
+      
+      17. "ANXIETY"
+
+      Answer "ANXIETY" if the patient is experiencing anxiety. The following
+      (non-exhaustive) list are all expressions of anxiety: anxiety, fear, extreme
+      fear, panic, panic attack, scared, worry, stress, mental stress, worried about
+      health, irritability, etc. If the patient's response is exactly or similar to
+      these expressions (including paraphrases), answer with "ANXIETY".
+
+
+      18. "DEPRESSION"
+
+      Answer "DEPRESSION" if the patient is experiencing depression. The following
+      (non-exhaustive) list are all expressions of depression: depression, sadness,
+      feeling of absence, emotional detachment, lack of wanting to do things, etc. If
+      the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "DEPRESSION".
+      
+      
+      19. "MENTAL HEALTH"
+      
+      Answer "MENTAL HEALTH" if the patient is experiencing mental health issues
+      *other than* anxiety or depression (which are in their own categories above). The
+      following (non-exhaustive) list are all expressions of non-anxiety non-depression
+      mental health issues: emotional problems, psychosomatic issues, lack of self
+      control, head disturbed, stress of having new twins, financial difficulties, etc.
+      If the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "MENTAL HEALTH".
+
+
+      20. "MSK ISSUES"
+
+      Answer "MSK ISSUES" if the patient is experiencing MSK (musculoskeletal) issues.
+      The following (non-exhaustive) list are all expressions of MSK issues: broken
+      bones, hurting rotator cuff, onset of osteoarthritis, difficulty bending at the
+      knee, hammer toes, cyst on the kneecap, etc. If the patient's response is exactly
+      or similar to these expressions (including paraphrases), answer with "MSK ISSUES".
+      
+      
+      21. "OPHTHALMOLOGY ISSUES"
+
+      Answer "OPHTHALMOLOGY ISSUES" if the patient is experiencing ophthalmology issues.
+      The following (non-exhaustive) list are all expressions of ophthalmology issues:
+      loss of left eyesight, blurry eyes, vision problems, delayed vision, etc. If the
+      patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "OPHTHALMOLOGY ISSUES".
+      
+
+      22. "RESPIRATORY ISSUES"
+
+      Answer "RESPIRATORY ISSUES" if the patient is experiencing respiratory issues.
+      The following (non-exhaustive) list are all expressions of respiratory issues:
+      rapid breathing, crackling noises when breathing, asthma, bronchitis, copd, etc.
+      coughing, dry cough, coughing up blood, rapid breathing, crackling noises when
+      breathing, asthma, bronchitis, copd, pleural effusion, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "RESPIRATORY ISSUES".
+      
+      
+      23. "THERMOREGULATION ISSUES"
+
+      Answer "THERMOREGULATION ISSUES" if the patient is experiencing thermoregulation
+      issues. The following (non-exhaustive) list are all expressions of
+      thermoregulation issues: chills, feeling cold, fingers turning blue, poor
+      circulation, cold sweats, night sweats, sweating, feeling hot, burning, hot
+      flashes, flush, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "THERMOREGULATION ISSUES".
+      
+      
+      24. "DERMATOLOGY ISSUES"
+
+      Answer "DERMATOLOGY ISSUES" if the patient is experiencing dermatology issues.
+      The following (non-exhaustive) list are all expressions of dermatology issues:
+      rash on the body, itching, skin hanging, skin rolls, right leg got blotchy, skin
+      on leg felt punctured, redness, etc. If the patient's response is exactly or
+      similar to these expressions (including paraphrases), answer with
+      "DERMATOLOGY ISSUES".
+
+
+      25. "OTHER: <symptom/diagnosis>"
+
+      Answer "OTHER: <symptom/diagnosis>" if the patient mentions some other symptom
+      or diagnosis that does not fit in neatly with the above options. Fill in the
+      "<symptom/diagnosis>" tag with a short (1-5 word) descriptive summary of the
+      symptom or diagnosis. If the patient gives more than one symptom or diagnosis
+      that does not fit neatly into the above options, list each answer on a new line,
+      such as:
+      
+      "OTHER: symptom #1
+      
+      OTHER: diagnosis #2"
+
+
+      26. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than recent symptoms
+      or diagnoses.
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I have shortness of breath, but also
+      am experiencing depression" to:
+
+      "SHORTNESS OF BREATH
+
+      DEPRESSION"
+
+
+      CAUTION: Each individual option *except* "CARDIAC" and "OTHER" should only appear
+      once. The option "IRRELEVANT" should always appear by itself. Do not output
+      anything else.
     question_ids: [1]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN0001, UHN00251, UHN00351]
-    parser_data: {"enum_options": [IRRELEVANT]}
+    parser_data:
+      options:
+        - {tag: "SHORTNESS OF BREATH", repeatable: false, value_sep: null}
+        - {tag: "FLUID RETENTION", repeatable: false, value_sep: null}
+        - {tag: "FATIGUE", repeatable: false, value_sep: null}
+        - {tag: "HEART FAILURE", repeatable: false, value_sep: null}
+        - {tag: "DIZZINESS", repeatable: false, value_sep: null}
+        - {tag: "MYOCARDIAL INFARCTION", repeatable: false, value_sep: null}
+        - {tag: "PALPITATIONS", repeatable: false, value_sep: null}
+        - {tag: "BLOOD PRESSURE", repeatable: false, value_sep: null}
+        - {tag: "CARDIAC", repeatable: true, value_sep: ":"}
+        - {tag: "NEUROLOGIC ISSUES", repeatable: false, value_sep: null}
+        - {tag: "INFECTION RELATED", repeatable: false, value_sep: null}
+        - {tag: "ENT ISSUES", repeatable: false, value_sep: null}
+        - {tag: "GI ISSUES", repeatable: false, value_sep: null}
+        - {tag: "UROLOGICAL/GYNECOLOGICAL ISSUES", repeatable: false, value_sep: null}
+        - {tag: "ELECTROLYTE ISSUES", repeatable: false, value_sep: null}
+        - {tag: "ORTHOPNEA", repeatable: false, value_sep: null}
+        - {tag: "ANXIETY", repeatable: false, value_sep: null}
+        - {tag: "DEPRESSION", repeatable: false, value_sep: null}
+        - {tag: "MENTAL HEALTH", repeatable: false, value_sep: null}
+        - {tag: "MSK ISSUES", repeatable: false, value_sep: null}
+        - {tag: "OPHTHALMOLOGY ISSUES", repeatable: false, value_sep: null}
+        - {tag: "RESPIRATORY ISSUES", repeatable: false, value_sep: null}
+        - {tag: "THERMOREGULATION ISSUES", repeatable: false, value_sep: null}
+        - {tag: "DERMATOLOGY ISSUES", repeatable: false, value_sep: null}
+        - {tag: "OTHER", repeatable: true, value_sep: ":"}
+        - {tag: "IRRELEVANT", repeatable: false, value_sep: null}
   Q_02:
     prompt: >-
-      In the snippet below, the interviewer is asking each patient to provide a 
-      list of symptoms they are or have recently been feeling or experiencing in 
-      the events leading up to coming to the hospital for this current admission. 
-      For each patient, your task is to extract a list of symptoms from the patient's
-      response. Format your answer by separating each listed symptom  with a comma
-      ",". It is possible that the patient talks about something other than their
-      symptoms. In this case, your answer should be a single word: "IRRELEVANT".
+      In the snippet below, the interviewer is asking each patient to provide a list
+      of symptoms they are or have recently been feeling or experiencing in  the events
+      leading up to coming to the hospital for this current admission. For each patient,
+      your task is to extract a list of specific symptoms or diagnoses from the
+      patient's response into one or more of the following options based on the most
+      appropriate case(s).
+
+
+      Options:
+
+      1. "SHORTNESS OF BREATH"
+
+      Answer "SHORTNESS OF BREATH" if the patient is experiencing shortness of breath.
+      The following (non-exhaustive) list are all expressions of shortness of breath:
+      short of breath, shortage of breath, water in lungs, congestion, low oxygen,
+      out of breath, can't breathe, breathing difficulty, wheezing, panting, labored
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "SHORTNESS OF BREATH".
+
+
+      2. "FLUID RETENTION"
+
+      Answer "FLUID RETENTION" if the patient is experiencing fluid retention. The
+      following (non-exhaustive) list are all expressions of fluid retention: ascites,
+      distention, stomach full, stomach discomfort, bloated abdomen, sharp pain in
+      belly, edema, swelling, swelling legs, overweight, rapid weight gain, gained many
+      pounds, fluid maintenance, etc. If the patient's response is exactly or similar
+      to these expressions (including paraphrases), answer with "FLUID RETENTION".
+
+
+      3. "FATIGUE"
+
+      Answer "FATIGUE" if the patient is experiencing fatigue. The following
+      (non-exhaustive) list are all expressions of fatigue: weak, tired, exhausted, low
+      strength, low energy, inability to walk, not feeling well, feeling sick, can't
+      carry a lot of weight, can't complete daily activities, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "FATIGUE".
+
+
+      4. "HEART FAILURE"
+
+      Answer "HEART FAILURE" if the patient mentions a heart failure diagnosis. The
+      following (non-exhaustive) list are all expressions of a heart failure diagnosis:
+      heart failure, congestive heart failure, weak heart, poor heart function, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "HEART FAILURE".
+      
+
+      5. "DIZZINESS"
+
+      Answer "DIZZINESS" if the patient is experiencing dizziness or syncope. The
+      following (non-exhaustive) list are all expressions of dizziness or syncope:
+      dizziness, fainting, syncope, passed out, feeling like I'm going to pass out,
+      collapsed, light headed, vertigo, loss of balance, etc. If the patient's response
+      is exactly or similar to these expressions (including paraphrases), answer with
+      "DIZZINESS".
+      
+
+      6. "MYOCARDIAL INFARCTION"
+
+      Answer "MYOCARDIAL INFARCTION" if the patient mentions a myocardial infarction
+      diagnosis or related symptoms. The following (non-exhaustive) list are all
+      expressions of a myocardial infarction diagnosis or related symptoms: heart
+      attack, heart pressure, heart pain, angina, chest pain, chest discomfort, chest
+      pressure, chest tightness, heaviness, something sitting on my chest, pain when
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "MYOCARDIAL INFARCTION".
+      
+
+      7. "PALPITATIONS"
+
+      Answer "PALPITATIONS" if the patient is experiencing palpitations. The following
+      (non-exhaustive) list are all expressions of palpitations: heart racing, rapid
+      heart rate, high pulse, heart pumping too much, heart pumping very fast, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "PALPITATIONS".
+      
+
+      8. "BLOOD PRESSURE"
+
+      Answer "BLOOD PRESSURE" if the patient mentions a blood pressure diagnosis. The
+      following (non-exhaustive) list are all expressions of a blood pressure diagnosis:
+      high blood pressure, low blood pressure, blood pressure, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "BLOOD PRESSURE".
+      
+
+      9. "CARDIAC: <symptom/diagnosis>"
+
+      Answer "CARDIAC: <symptom/diagnosis>" if the patient mentions some other cardiac
+      symptom or diagnosis that does not fit into the more specific above options. Fill
+      in the "<symptom/diagnosis>" tag with a short (1-5 word) descriptive summary of
+      the symptom or diagnosis. The following (non-exhaustive) list are all expressions
+      of other cardiac symptoms or diagnoses: angioplasty, malfunctioning pacemaker,
+      arrhythmia, heart flutters, bad heart valve, leaking valve, valvular disease,
+      mitral valve prolapse, aortic valve calcification, aortic valve anomaly, valve
+      replacement, valve regurgitation, vad (ventricular artery disease), blockages,
+      blocked arteries, left bundle branch block, afib (atrial fibrillation), cardiac
+      arrest, bradycardia, hypertrophic cardiomyopathy, vt (ventricular tachycardia),
+      shock from defibrillator, icd shock, ipf (idiopathic pulmonary fibrosis), heart
+      problems, heart conditions, heart issues, etc. Use appropriate medical terminology
+      to paraphrase the patient where possible. For example, if the patient expresses
+      having "bad heart rhythm", answer with "CARDIAC: arrhythmia". 
+
+
+      10. "NEUROLOGIC ISSUES"
+
+      Answer "NEUROLOGIC ISSUES" if the patient is experiencing neurologic issues.
+      The following (non-exhaustive) list are all expressions of neurologic issues:
+      confusion, loss of memory, disorientation upon waking up, slurred speech, stroke,
+      loss of use in right leg, loss of use in right arm, left arm numbness, cramping
+      of the feet, sharp pains in heel, hot water sensation on foot, stabbing feeling,
+      sharp/lightning bolts, very uncomfortable, tingling in fingers tingling in jaws,
+      equilibrium off, restlessness, restless leg syndrome, hand shaking, headache, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "NEUROLOGIC ISSUES".
+      
+
+      11. "INFECTION RELATED"
+
+      Answer "INFECTION RELATED" if the patient is experiencing infection related
+      issues. The following (non-exhaustive) list are all expressions of infection
+      related issues: big sores with lots of pus, blisters all over legs, infection in
+      legs, swelling in a wound in the leg, open wound on toe, blood poisoning, blood
+      infection, lung infection, kidney infection, antibiotics, abscessed tooth, flu,
+      strep throat, nose dripping, sinus cold, sneezing, fever, releasing mucus, phlegm,
+      swollen lymph nodes, pneumonia, covid, covid vaccine, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "INFECTION RELATED".
+      
+
+      12. "ENT ISSUES"
+
+      Answer "ENT ISSUES" if the patient is experiencing ENT (ear, nose, throat) issues.
+      The following (non-exhaustive) list are all expressions of ENT issues: head upset,
+      ringing in ears, ear bleeding, pressure across the neck, throat constriction,
+      throat swelling, feeling of a big rock on throat, fatigue in the throat, itchy
+      throat, hoarse voice, losing my voice, tongue numbness, thyroid issue, ear issue,
+      neck cancer, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "ENT ISSUES".
+
+
+      13. "GI ISSUES"
+
+      Answer "GI ISSUES" if the patient is experiencing GI (gastrointestinal) issues.
+      The following (non-exhaustive) list are all expressions of GI issues: anorexia,
+      vomiting, lost appetite, nausea, increased appetite, lost taste buds, excessive
+      saliva, dry mouth, GERD, heart burn, acid reflux, esophagitis, indigestion,
+      digestion issues, dry heaves, gastroenteritis, epigastric concerns, milk allergy,
+      gluten allergy, constipation, difficulty having bowel movements, diarrhea, stomach
+      pain, intestinal pain, burping, belching, a lot of gas, flatulating, something in
+      my gallbladder, gallstone, food poisoning, liver issues, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "GI ISSUES".
+
+
+      14. "UROLOGICAL/GYNECOLOGICAL ISSUES"
+
+      Answer "UROLOGICAL/GYNECOLOGICAL ISSUES" if the patient is experiencing urological
+      or gynecological issues. The following (non-exhaustive) list are all expressions
+      of urological or gynecological issues: prostate issues, menstrual discomfort,
+      kidney stones, kidney issues, inability to urinate, incontinence, using catheter,
+      etc. If the patient's response is exactly or similar to these expressions
+      (including paraphrases), answer with "UROLOGICAL/GYNECOLOGICAL ISSUES".
+      
+
+      15. "ELECTROLYTE ISSUES"
+
+      Answer "ELECTROLYTE ISSUES" if the patient is experiencing electrolyte issues.
+      The following (non-exhaustive) list are all expressions of electrolyte issues:
+      low potassium, high potassium, low sodium, high sodium, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "ELECTROLYTE ISSUES".
       
       
-      Output either "IRRELEVANT" or a comma-separated list of symptoms.
-      Do not output anything else.
+      16. "ORTHOPNEA"
+
+      Answer "ORTHOPNEA" if the patient is experiencing orthopnea. The following
+      (non-exhaustive) list are all expressions of orthopnea: difficulty sleeping,
+      can't sleep, insomnia, prolonged time to fall asleep, can't sleep while lying
+      down, inability to lie down, waking up gasping, unrest, sleep disturbance, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "ORTHOPNEA".
+      
+      
+      17. "ANXIETY"
+
+      Answer "ANXIETY" if the patient is experiencing anxiety. The following
+      (non-exhaustive) list are all expressions of anxiety: anxiety, fear, extreme
+      fear, panic, panic attack, scared, worry, stress, mental stress, worried about
+      health, irritability, etc. If the patient's response is exactly or similar to
+      these expressions (including paraphrases), answer with "ANXIETY".
+
+
+      18. "DEPRESSION"
+
+      Answer "DEPRESSION" if the patient is experiencing depression. The following
+      (non-exhaustive) list are all expressions of depression: depression, sadness,
+      feeling of absence, emotional detachment, lack of wanting to do things, etc. If
+      the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "DEPRESSION".
+      
+      
+      19. "MENTAL HEALTH"
+      
+      Answer "MENTAL HEALTH" if the patient is experiencing mental health issues
+      *other than* anxiety or depression (which are in their own categories above). The
+      following (non-exhaustive) list are all expressions of non-anxiety non-depression
+      mental health issues: emotional problems, psychosomatic issues, lack of self
+      control, head disturbed, stress of having new twins, financial difficulties, etc.
+      If the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "MENTAL HEALTH".
+
+
+      20. "MSK ISSUES"
+
+      Answer "MSK ISSUES" if the patient is experiencing MSK (musculoskeletal) issues.
+      The following (non-exhaustive) list are all expressions of MSK issues: broken
+      bones, hurting rotator cuff, onset of osteoarthritis, difficulty bending at the
+      knee, hammer toes, cyst on the kneecap, etc. If the patient's response is exactly
+      or similar to these expressions (including paraphrases), answer with "MSK ISSUES".
+      
+      
+      21. "OPHTHALMOLOGY ISSUES"
+
+      Answer "OPHTHALMOLOGY ISSUES" if the patient is experiencing ophthalmology issues.
+      The following (non-exhaustive) list are all expressions of ophthalmology issues:
+      loss of left eyesight, blurry eyes, vision problems, delayed vision, etc. If the
+      patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "OPHTHALMOLOGY ISSUES".
+      
+
+      22. "RESPIRATORY ISSUES"
+
+      Answer "RESPIRATORY ISSUES" if the patient is experiencing respiratory issues.
+      The following (non-exhaustive) list are all expressions of respiratory issues:
+      coughing, dry cough, coughing up blood, rapid breathing, crackling noises when
+      breathing, asthma, bronchitis, copd, pleural effusion, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "RESPIRATORY ISSUES".
+      
+      
+      23. "THERMOREGULATION ISSUES"
+
+      Answer "THERMOREGULATION ISSUES" if the patient is experiencing thermoregulation
+      issues. The following (non-exhaustive) list are all expressions of
+      thermoregulation issues: chills, feeling cold, fingers turning blue, poor
+      circulation, cold sweats, night sweats, sweating, feeling hot, burning, hot
+      flashes, flush, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "THERMOREGULATION ISSUES".
+      
+      
+      24. "DERMATOLOGY ISSUES"
+
+      Answer "DERMATOLOGY ISSUES" if the patient is experiencing dermatology issues.
+      The following (non-exhaustive) list are all expressions of dermatology issues:
+      rash on the body, itching, skin hanging, skin rolls, right leg got blotchy, skin
+      on leg felt punctured, redness, etc. If the patient's response is exactly or
+      similar to these expressions (including paraphrases), answer with
+      "DERMATOLOGY ISSUES".
+
+
+      25. "OTHER: <symptom/diagnosis>"
+
+      Answer "OTHER: <symptom/diagnosis>" if the patient mentions some other symptom
+      or diagnosis that does not fit in neatly with the above options. Fill in the
+      "<symptom/diagnosis>" tag with a short (1-5 word) descriptive summary of the
+      symptom or diagnosis. If the patient gives more than one symptom or diagnosis
+      that does not fit neatly into the above options, list each answer on a new line,
+      such as:
+      
+      "OTHER: symptom #1
+      
+      OTHER: diagnosis #2"
+
+
+      26. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than recent symptoms
+      or diagnoses.
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I have shortness of breath, but also
+      am experiencing depression" to:
+
+      "SHORTNESS OF BREATH
+
+      DEPRESSION"
+
+
+      CAUTION: Each individual option *except* "CARDIAC" and "OTHER" should only appear
+      once. The option "IRRELEVANT" should always appear by itself. Do not output
+      anything else.
     question_ids: [2]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN00151, UHN00251, UHN00501]
-    parser_data: {"enum_options": [IRRELEVANT]}
+    parser_data:
+      options:
+        - { tag: "SHORTNESS OF BREATH", repeatable: false, value_sep: null }
+        - { tag: "FLUID RETENTION", repeatable: false, value_sep: null }
+        - { tag: "FATIGUE", repeatable: false, value_sep: null }
+        - { tag: "HEART FAILURE", repeatable: false, value_sep: null }
+        - { tag: "DIZZINESS", repeatable: false, value_sep: null }
+        - { tag: "MYOCARDIAL INFARCTION", repeatable: false, value_sep: null }
+        - { tag: "PALPITATIONS", repeatable: false, value_sep: null }
+        - { tag: "BLOOD PRESSURE", repeatable: false, value_sep: null }
+        - { tag: "CARDIAC", repeatable: true, value_sep: ":" }
+        - { tag: "NEUROLOGIC ISSUES", repeatable: false, value_sep: null }
+        - { tag: "INFECTION RELATED", repeatable: false, value_sep: null }
+        - { tag: "ENT ISSUES", repeatable: false, value_sep: null }
+        - { tag: "GI ISSUES", repeatable: false, value_sep: null }
+        - { tag: "UROLOGICAL/GYNECOLOGICAL ISSUES", repeatable: false, value_sep: null }
+        - { tag: "ELECTROLYTE ISSUES", repeatable: false, value_sep: null }
+        - { tag: "ORTHOPNEA", repeatable: false, value_sep: null }
+        - { tag: "ANXIETY", repeatable: false, value_sep: null }
+        - { tag: "DEPRESSION", repeatable: false, value_sep: null }
+        - { tag: "MENTAL HEALTH", repeatable: false, value_sep: null }
+        - { tag: "MSK ISSUES", repeatable: false, value_sep: null }
+        - { tag: "OPHTHALMOLOGY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "RESPIRATORY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "THERMOREGULATION ISSUES", repeatable: false, value_sep: null }
+        - { tag: "DERMATOLOGY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "OTHER", repeatable: true, value_sep: ":" }
+        - { tag: "IRRELEVANT", repeatable: false, value_sep: null }
   Q_04:
     prompt: >-
       In the snippet below, the interviewer is asking each patient to provide a 
       list of any other unusual symptoms or feelings they are experiencing. For 
-      each patient, your task is to extract a list of symptoms or feelings from 
-      the patient's response. Format your answer by separating each listed item 
-      with a comma ",".
+      each patient, your task is to extract a list of specific symptoms or diagnoses
+      from the patient's response into one or more of the following options based on
+      the most appropriate case(s).
+
+
+      Options:
+
+      1. "SHORTNESS OF BREATH"
+
+      Answer "SHORTNESS OF BREATH" if the patient is experiencing shortness of breath.
+      The following (non-exhaustive) list are all expressions of shortness of breath:
+      short of breath, shortage of breath, water in lungs, congestion, low oxygen,
+      out of breath, can't breathe, breathing difficulty, wheezing, panting, labored
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "SHORTNESS OF BREATH".
+
+
+      2. "FLUID RETENTION"
+
+      Answer "FLUID RETENTION" if the patient is experiencing fluid retention. The
+      following (non-exhaustive) list are all expressions of fluid retention: ascites,
+      distention, stomach full, stomach discomfort, bloated abdomen, sharp pain in
+      belly, edema, swelling, swelling legs, overweight, rapid weight gain, gained many
+      pounds, fluid maintenance, etc. If the patient's response is exactly or similar
+      to these expressions (including paraphrases), answer with "FLUID RETENTION".
+
+
+      3. "FATIGUE"
+
+      Answer "FATIGUE" if the patient is experiencing fatigue. The following
+      (non-exhaustive) list are all expressions of fatigue: weak, tired, exhausted, low
+      strength, low energy, inability to walk, not feeling well, feeling sick, can't
+      carry a lot of weight, can't complete daily activities, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "FATIGUE".
+
+
+      4. "HEART FAILURE"
+
+      Answer "HEART FAILURE" if the patient mentions a heart failure diagnosis. The
+      following (non-exhaustive) list are all expressions of a heart failure diagnosis:
+      heart failure, congestive heart failure, weak heart, poor heart function, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "HEART FAILURE".
+      
+
+      5. "DIZZINESS"
+
+      Answer "DIZZINESS" if the patient is experiencing dizziness or syncope. The
+      following (non-exhaustive) list are all expressions of dizziness or syncope:
+      dizziness, fainting, syncope, passed out, feeling like I'm going to pass out,
+      collapsed, light headed, vertigo, loss of balance, etc. If the patient's response
+      is exactly or similar to these expressions (including paraphrases), answer with
+      "DIZZINESS".
+      
+
+      6. "MYOCARDIAL INFARCTION"
+
+      Answer "MYOCARDIAL INFARCTION" if the patient mentions a myocardial infarction
+      diagnosis or related symptoms. The following (non-exhaustive) list are all
+      expressions of a myocardial infarction diagnosis or related symptoms: heart
+      attack, heart pressure, heart pain, angina, chest pain, chest discomfort, chest
+      pressure, chest tightness, heaviness, something sitting on my chest, pain when
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "MYOCARDIAL INFARCTION".
+      
+
+      7. "PALPITATIONS"
+
+      Answer "PALPITATIONS" if the patient is experiencing palpitations. The following
+      (non-exhaustive) list are all expressions of palpitations: heart racing, rapid
+      heart rate, high pulse, heart pumping too much, heart pumping very fast, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "PALPITATIONS".
+      
+
+      8. "BLOOD PRESSURE"
+
+      Answer "BLOOD PRESSURE" if the patient mentions a blood pressure diagnosis. The
+      following (non-exhaustive) list are all expressions of a blood pressure diagnosis:
+      high blood pressure, low blood pressure, blood pressure, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "BLOOD PRESSURE".
+      
+
+      9. "CARDIAC: <symptom/diagnosis>"
+
+      Answer "CARDIAC: <symptom/diagnosis>" if the patient mentions some other cardiac
+      symptom or diagnosis that does not fit into the more specific above options. Fill
+      in the "<symptom/diagnosis>" tag with a short (1-5 word) descriptive summary of
+      the symptom or diagnosis. The following (non-exhaustive) list are all expressions
+      of other cardiac symptoms or diagnoses: angioplasty, malfunctioning pacemaker,
+      arrhythmia, heart flutters, bad heart valve, leaking valve, valvular disease,
+      mitral valve prolapse, aortic valve calcification, aortic valve anomaly, valve
+      replacement, valve regurgitation, vad (ventricular artery disease), blockages,
+      blocked arteries, left bundle branch block, afib (atrial fibrillation), cardiac
+      arrest, bradycardia, hypertrophic cardiomyopathy, vt (ventricular tachycardia),
+      shock from defibrillator, icd shock, ipf (idiopathic pulmonary fibrosis), heart
+      problems, heart conditions, heart issues, etc. Use appropriate medical terminology
+      to paraphrase the patient where possible. For example, if the patient expresses
+      having "bad heart rhythm", answer with "CARDIAC: arrhythmia". 
+
+
+      10. "NEUROLOGIC ISSUES"
+
+      Answer "NEUROLOGIC ISSUES" if the patient is experiencing neurologic issues.
+      The following (non-exhaustive) list are all expressions of neurologic issues:
+      confusion, loss of memory, disorientation upon waking up, slurred speech, stroke,
+      loss of use in right leg, loss of use in right arm, left arm numbness, cramping
+      of the feet, sharp pains in heel, hot water sensation on foot, stabbing feeling,
+      sharp/lightning bolts, very uncomfortable, tingling in fingers tingling in jaws,
+      equilibrium off, restlessness, restless leg syndrome, hand shaking, headache, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "NEUROLOGIC ISSUES".
+      
+
+      11. "INFECTION RELATED"
+
+      Answer "INFECTION RELATED" if the patient is experiencing infection related
+      issues. The following (non-exhaustive) list are all expressions of infection
+      related issues: big sores with lots of pus, blisters all over legs, infection in
+      legs, swelling in a wound in the leg, open wound on toe, blood poisoning, blood
+      infection, lung infection, kidney infection, antibiotics, abscessed tooth, flu,
+      strep throat, nose dripping, sinus cold, sneezing, fever, releasing mucus, phlegm,
+      swollen lymph nodes, pneumonia, covid, covid vaccine, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "INFECTION RELATED".
+      
+
+      12. "ENT ISSUES"
+
+      Answer "ENT ISSUES" if the patient is experiencing ENT (ear, nose, throat) issues.
+      The following (non-exhaustive) list are all expressions of ENT issues: head upset,
+      ringing in ears, ear bleeding, pressure across the neck, throat constriction,
+      throat swelling, feeling of a big rock on throat, fatigue in the throat, itchy
+      throat, hoarse voice, losing my voice, tongue numbness, thyroid issue, ear issue,
+      neck cancer, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "ENT ISSUES".
+
+
+      13. "GI ISSUES"
+
+      Answer "GI ISSUES" if the patient is experiencing GI (gastrointestinal) issues.
+      The following (non-exhaustive) list are all expressions of GI issues: anorexia,
+      vomiting, lost appetite, nausea, increased appetite, lost taste buds, excessive
+      saliva, dry mouth, GERD, heart burn, acid reflux, esophagitis, indigestion,
+      digestion issues, dry heaves, gastroenteritis, epigastric concerns, milk allergy,
+      gluten allergy, constipation, difficulty having bowel movements, diarrhea, stomach
+      pain, intestinal pain, burping, belching, a lot of gas, flatulating, something in
+      my gallbladder, gallstone, food poisoning, liver issues, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "GI ISSUES".
+
+
+      14. "UROLOGICAL/GYNECOLOGICAL ISSUES"
+
+      Answer "UROLOGICAL/GYNECOLOGICAL ISSUES" if the patient is experiencing urological
+      or gynecological issues. The following (non-exhaustive) list are all expressions
+      of urological or gynecological issues: prostate issues, menstrual discomfort,
+      kidney stones, kidney issues, inability to urinate, incontinence, using catheter,
+      etc. If the patient's response is exactly or similar to these expressions
+      (including paraphrases), answer with "UROLOGICAL/GYNECOLOGICAL ISSUES".
+      
+
+      15. "ELECTROLYTE ISSUES"
+
+      Answer "ELECTROLYTE ISSUES" if the patient is experiencing electrolyte issues.
+      The following (non-exhaustive) list are all expressions of electrolyte issues:
+      low potassium, high potassium, low sodium, high sodium, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "ELECTROLYTE ISSUES".
       
       
-      NOTE: It is possible that the patient talks about something other than 
-      their symptoms or feelings. In this case, your answer should be a single 
-      word: "IRRELEVANT".
+      16. "ORTHOPNEA"
+
+      Answer "ORTHOPNEA" if the patient is experiencing orthopnea. The following
+      (non-exhaustive) list are all expressions of orthopnea: difficulty sleeping,
+      can't sleep, insomnia, prolonged time to fall asleep, can't sleep while lying
+      down, inability to lie down, waking up gasping, unrest, sleep disturbance, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "ORTHOPNEA".
       
       
-      NOTE: It is possible that the patient says that they are not experiencing 
-      any other symptoms or feelings. In this case, your answer should be a 
-      single word: "NONE".
+      17. "ANXIETY"
+
+      Answer "ANXIETY" if the patient is experiencing anxiety. The following
+      (non-exhaustive) list are all expressions of anxiety: anxiety, fear, extreme
+      fear, panic, panic attack, scared, worry, stress, mental stress, worried about
+      health, irritability, etc. If the patient's response is exactly or similar to
+      these expressions (including paraphrases), answer with "ANXIETY".
+
+
+      18. "DEPRESSION"
+
+      Answer "DEPRESSION" if the patient is experiencing depression. The following
+      (non-exhaustive) list are all expressions of depression: depression, sadness,
+      feeling of absence, emotional detachment, lack of wanting to do things, etc. If
+      the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "DEPRESSION".
       
       
-      Output either "IRRELEVANT" or "NONE" or a comma-separated list of 
-      symptoms/feelings. Do not output anything else.
+      19. "MENTAL HEALTH"
+      
+      Answer "MENTAL HEALTH" if the patient is experiencing mental health issues
+      *other than* anxiety or depression (which are in their own categories above). The
+      following (non-exhaustive) list are all expressions of non-anxiety non-depression
+      mental health issues: emotional problems, psychosomatic issues, lack of self
+      control, head disturbed, stress of having new twins, financial difficulties, etc.
+      If the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "MENTAL HEALTH".
+
+
+      20. "MSK ISSUES"
+
+      Answer "MSK ISSUES" if the patient is experiencing MSK (musculoskeletal) issues.
+      The following (non-exhaustive) list are all expressions of MSK issues: broken
+      bones, hurting rotator cuff, onset of osteoarthritis, difficulty bending at the
+      knee, hammer toes, cyst on the kneecap, etc. If the patient's response is exactly
+      or similar to these expressions (including paraphrases), answer with "MSK ISSUES".
+      
+      
+      21. "OPHTHALMOLOGY ISSUES"
+
+      Answer "OPHTHALMOLOGY ISSUES" if the patient is experiencing ophthalmology issues.
+      The following (non-exhaustive) list are all expressions of ophthalmology issues:
+      loss of left eyesight, blurry eyes, vision problems, delayed vision, etc. If the
+      patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "OPHTHALMOLOGY ISSUES".
+      
+
+      22. "RESPIRATORY ISSUES"
+
+      Answer "RESPIRATORY ISSUES" if the patient is experiencing respiratory issues.
+      The following (non-exhaustive) list are all expressions of respiratory issues:
+      coughing, dry cough, coughing up blood, rapid breathing, crackling noises when
+      breathing, asthma, bronchitis, copd, pleural effusion, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "RESPIRATORY ISSUES".
+      
+      
+      23. "THERMOREGULATION ISSUES"
+
+      Answer "THERMOREGULATION ISSUES" if the patient is experiencing thermoregulation
+      issues. The following (non-exhaustive) list are all expressions of
+      thermoregulation issues: chills, feeling cold, fingers turning blue, poor
+      circulation, cold sweats, night sweats, sweating, feeling hot, burning, hot
+      flashes, flush, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "THERMOREGULATION ISSUES".
+      
+      
+      24. "DERMATOLOGY ISSUES"
+
+      Answer "DERMATOLOGY ISSUES" if the patient is experiencing dermatology issues.
+      The following (non-exhaustive) list are all expressions of dermatology issues:
+      rash on the body, itching, skin hanging, skin rolls, right leg got blotchy, skin
+      on leg felt punctured, redness, etc. If the patient's response is exactly or
+      similar to these expressions (including paraphrases), answer with
+      "DERMATOLOGY ISSUES".
+
+
+      25. "OTHER: <symptom/diagnosis>"
+
+      Answer "OTHER: <symptom/diagnosis>" if the patient mentions some other symptom
+      or diagnosis that does not fit in neatly with the above options. Fill in the
+      "<symptom/diagnosis>" tag with a short (1-5 word) descriptive summary of the
+      symptom or diagnosis. If the patient gives more than one symptom or diagnosis
+      that does not fit neatly into the above options, list each answer on a new line,
+      such as:
+      
+      "OTHER: symptom #1
+      
+      OTHER: diagnosis #2"
+
+
+      26. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than recent symptoms
+      or diagnoses.
+      
+      
+      27. "NONE"
+      
+      It is possible that the patient says that they are not experiencing  any other
+      symptoms or feelings. In this case, your answer should be a single word: "NONE".
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I have shortness of breath, but also
+      am experiencing depression" to:
+
+      "SHORTNESS OF BREATH
+
+      DEPRESSION"
+
+
+      CAUTION: Each individual option *except* "CARDIAC" and "OTHER" should only appear
+      once. The options "IRRELEVANT" and "NONE" should always appear by themselves.
+      Do not output anything else.
     question_ids: [4]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN0001, UHN00151, UHN00251]
-    parser_data: {"enum_options": [IRRELEVANT, NONE]}
+    parser_data:
+      options:
+        - { tag: "SHORTNESS OF BREATH", repeatable: false, value_sep: null }
+        - { tag: "FLUID RETENTION", repeatable: false, value_sep: null }
+        - { tag: "FATIGUE", repeatable: false, value_sep: null }
+        - { tag: "HEART FAILURE", repeatable: false, value_sep: null }
+        - { tag: "DIZZINESS", repeatable: false, value_sep: null }
+        - { tag: "MYOCARDIAL INFARCTION", repeatable: false, value_sep: null }
+        - { tag: "PALPITATIONS", repeatable: false, value_sep: null }
+        - { tag: "BLOOD PRESSURE", repeatable: false, value_sep: null }
+        - { tag: "CARDIAC", repeatable: true, value_sep: ":" }
+        - { tag: "NEUROLOGIC ISSUES", repeatable: false, value_sep: null }
+        - { tag: "INFECTION RELATED", repeatable: false, value_sep: null }
+        - { tag: "ENT ISSUES", repeatable: false, value_sep: null }
+        - { tag: "GI ISSUES", repeatable: false, value_sep: null }
+        - { tag: "UROLOGICAL/GYNECOLOGICAL ISSUES", repeatable: false, value_sep: null }
+        - { tag: "ELECTROLYTE ISSUES", repeatable: false, value_sep: null }
+        - { tag: "ORTHOPNEA", repeatable: false, value_sep: null }
+        - { tag: "ANXIETY", repeatable: false, value_sep: null }
+        - { tag: "DEPRESSION", repeatable: false, value_sep: null }
+        - { tag: "MENTAL HEALTH", repeatable: false, value_sep: null }
+        - { tag: "MSK ISSUES", repeatable: false, value_sep: null }
+        - { tag: "OPHTHALMOLOGY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "RESPIRATORY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "THERMOREGULATION ISSUES", repeatable: false, value_sep: null }
+        - { tag: "DERMATOLOGY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "OTHER", repeatable: true, value_sep: ":" }
+        - { tag: "IRRELEVANT", repeatable: false, value_sep: null }
+        - { tag: "NONE", repeatable: false, value_sep: null }
   Q_05:
     prompt: >-
       In the snippet below, the interviewer is asking each patient to provide
@@ -444,32 +1405,377 @@ clusters:
     parser_data: {"reject": IRRELEVANT}
   Q_08a:
     prompt: >-
-      IIn the snippet below, the interviewer is asking each patient to provide a 
+      In the snippet below, the interviewer is asking each patient to provide a 
       list of causes that the patient initially thought were the source of their 
-      current symptoms. For each patient, your task is to extract a list of 
-      symptoms or feelings from the patient's response. Format your answer by 
-      separating each listed item with a comma ",".
+      current symptoms. For each patient, your task is to extract a list of specific
+      causes, symptoms, feelings, or diagnoses from the patient's response into one
+      or more of the following options based on the most appropriate case(s).
+
+
+      Options:
+
+      1. "SHORTNESS OF BREATH"
+
+      Answer "SHORTNESS OF BREATH" if the patient thinks shortness of breath is a cause.
+      The following (non-exhaustive) list are all expressions of shortness of breath:
+      short of breath, shortage of breath, water in lungs, congestion, low oxygen,
+      out of breath, can't breathe, breathing difficulty, wheezing, panting, labored
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "SHORTNESS OF BREATH".
+
+
+      2. "FLUID RETENTION"
+
+      Answer "FLUID RETENTION" if the patient thinks fluid retention is a cause. The
+      following (non-exhaustive) list are all expressions of fluid retention: ascites,
+      distention, stomach full, stomach discomfort, bloated abdomen, sharp pain in
+      belly, edema, swelling, swelling legs, overweight, rapid weight gain, gained many
+      pounds, fluid maintenance, etc. If the patient's response is exactly or similar
+      to these expressions (including paraphrases), answer with "FLUID RETENTION".
+
+
+      3. "FATIGUE"
+
+      Answer "FATIGUE" if the patient thinks fatigue is a cause. The following
+      (non-exhaustive) list are all expressions of fatigue: weak, tired, exhausted, low
+      strength, low energy, inability to walk, not feeling well, feeling sick, can't
+      carry a lot of weight, can't complete daily activities, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "FATIGUE".
+
+
+      4. "HEART FAILURE"
+
+      Answer "HEART FAILURE" if the patient thinks heart failure is a cause. The
+      following (non-exhaustive) list are all expressions of a heart failure diagnosis:
+      heart failure, congestive heart failure, weak heart, poor heart function, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "HEART FAILURE".
+      
+
+      5. "DIZZINESS"
+
+      Answer "DIZZINESS" if the patient thinks dizziness or syncope is a cause. The
+      following (non-exhaustive) list are all expressions of dizziness or syncope:
+      dizziness, fainting, syncope, passed out, feeling like I'm going to pass out,
+      collapsed, light headed, vertigo, loss of balance, etc. If the patient's response
+      is exactly or similar to these expressions (including paraphrases), answer with
+      "DIZZINESS".
+      
+
+      6. "MYOCARDIAL INFARCTION"
+
+      Answer "MYOCARDIAL INFARCTION" if the patient thinks a myocardial infarction
+      or related symptom is a cause. The following (non-exhaustive) list are all
+      expressions of a myocardial infarction diagnosis or related symptoms: heart
+      attack, heart pressure, heart pain, angina, chest pain, chest discomfort, chest
+      pressure, chest tightness, heaviness, something sitting on my chest, pain when
+      breathing, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "MYOCARDIAL INFARCTION".
+      
+
+      7. "PALPITATIONS"
+
+      Answer "PALPITATIONS" if the patient thinks palpitations are a cause. The following
+      (non-exhaustive) list are all expressions of palpitations: heart racing, rapid
+      heart rate, high pulse, heart pumping too much, heart pumping very fast, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "PALPITATIONS".
+      
+
+      8. "BLOOD PRESSURE"
+
+      Answer "BLOOD PRESSURE" if the patient thinks their blood pressure is a cause. The
+      following (non-exhaustive) list are all expressions of a blood pressure diagnosis:
+      high blood pressure, low blood pressure, blood pressure, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "BLOOD PRESSURE".
+      
+
+      9. "CARDIAC: <symptom/diagnosis>"
+
+      Answer "CARDIAC: <symptom/diagnosis>" if the patient thinks some other cardiac
+      symptom or diagnosis that does not fit into the more specific above options is a
+      cause. Fill in the "<symptom/diagnosis>" tag with a short (1-5 word) descriptive
+      summary of the symptom or diagnosis. The following (non-exhaustive) list are all
+      expressions of other cardiac symptoms or diagnoses: angioplasty, malfunctioning
+      pacemaker, arrhythmia, heart flutters, bad heart valve, leaking valve, valvular
+      disease, mitral valve prolapse, aortic valve calcification, aortic valve anomaly,
+      valve replacement, valve regurgitation, vad (ventricular artery disease), blockages,
+      blocked arteries, left bundle branch block, afib (atrial fibrillation), cardiac
+      arrest, bradycardia, hypertrophic cardiomyopathy, vt (ventricular tachycardia),
+      shock from defibrillator, icd shock, ipf (idiopathic pulmonary fibrosis), heart
+      problems, heart conditions, heart issues, etc. Use appropriate medical terminology
+      to paraphrase the patient where possible. For example, if the patient expresses
+      having "bad heart rhythm", answer with "CARDIAC: arrhythmia". 
+
+
+      10. "NEUROLOGIC ISSUES"
+
+      Answer "NEUROLOGIC ISSUES" if the patient thinks neurologic issues are a cause.
+      The following (non-exhaustive) list are all expressions of neurologic issues:
+      confusion, loss of memory, disorientation upon waking up, slurred speech, stroke,
+      loss of use in right leg, loss of use in right arm, left arm numbness, cramping
+      of the feet, sharp pains in heel, hot water sensation on foot, stabbing feeling,
+      sharp/lightning bolts, very uncomfortable, tingling in fingers tingling in jaws,
+      equilibrium off, restlessness, restless leg syndrome, hand shaking, headache, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "NEUROLOGIC ISSUES".
+      
+
+      11. "INFECTION RELATED"
+
+      Answer "INFECTION RELATED" if the patient thinks infection related issues are a
+      cause. The following (non-exhaustive) list are all expressions of infection
+      related issues: big sores with lots of pus, blisters all over legs, infection in
+      legs, swelling in a wound in the leg, open wound on toe, blood poisoning, blood
+      infection, lung infection, kidney infection, antibiotics, abscessed tooth, flu,
+      strep throat, nose dripping, sinus cold, sneezing, fever, releasing mucus, phlegm,
+      swollen lymph nodes, pneumonia, covid, covid vaccine, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "INFECTION RELATED".
+      
+
+      12. "ENT ISSUES"
+
+      Answer "ENT ISSUES" if the patient thinks ENT (ear, nose, throat) issues are a
+      cause. The following (non-exhaustive) list are all expressions of ENT issues: head
+      upset, ringing in ears, ear bleeding, pressure across the neck, throat constriction,
+      throat swelling, feeling of a big rock on throat, fatigue in the throat, itchy
+      throat, hoarse voice, losing my voice, tongue numbness, thyroid issue, ear issue,
+      neck cancer, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "ENT ISSUES".
+
+
+      13. "GI ISSUES"
+
+      Answer "GI ISSUES" if the patient thinks GI (gastrointestinal) issues are a cause.
+      The following (non-exhaustive) list are all expressions of GI issues: anorexia,
+      vomiting, lost appetite, nausea, increased appetite, lost taste buds, excessive
+      saliva, dry mouth, GERD, heart burn, acid reflux, esophagitis, indigestion,
+      digestion issues, dry heaves, gastroenteritis, epigastric concerns, milk allergy,
+      gluten allergy, constipation, difficulty having bowel movements, diarrhea, stomach
+      pain, intestinal pain, burping, belching, a lot of gas, flatulating, something in
+      my gallbladder, gallstone, food poisoning, liver issues, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "GI ISSUES".
+
+
+      14. "UROLOGICAL/GYNECOLOGICAL ISSUES"
+
+      Answer "UROLOGICAL/GYNECOLOGICAL ISSUES" if the patient thinks urological or
+      gynecological issues are a cause. The following (non-exhaustive) list are all
+      expressions of urological or gynecological issues: prostate issues, menstrual
+      discomfort, kidney stones, kidney issues, inability to urinate, incontinence,
+      using catheter, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "UROLOGICAL/GYNECOLOGICAL ISSUES".
+      
+
+      15. "ELECTROLYTE ISSUES"
+
+      Answer "ELECTROLYTE ISSUES" if the patient thinks electrolyte issues are a cause.
+      The following (non-exhaustive) list are all expressions of electrolyte issues:
+      low potassium, high potassium, low sodium, high sodium, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "ELECTROLYTE ISSUES".
       
       
-      NOTE: It is possible that the patient talks about something other than 
-      their symptoms or feelings. In this case, your answer should be a single 
-      word: "IRRELEVANT".
+      16. "ORTHOPNEA"
+
+      Answer "ORTHOPNEA" if the patient thinks orthopnea is a cause. The following
+      (non-exhaustive) list are all expressions of orthopnea: difficulty sleeping,
+      can't sleep, insomnia, prolonged time to fall asleep, can't sleep while lying
+      down, inability to lie down, waking up gasping, unrest, sleep disturbance, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "ORTHOPNEA".
       
       
-      NOTE: It is possible that the patient says that they do not know or do not 
-      remember. In this case, your answer should be a single word: "UNKNOWN".
+      17. "ANXIETY"
+
+      Answer "ANXIETY" if the patient thinks anxiety is a cause. The following
+      (non-exhaustive) list are all expressions of anxiety: anxiety, fear, extreme
+      fear, panic, panic attack, scared, worry, stress, mental stress, worried about
+      health, irritability, etc. If the patient's response is exactly or similar to
+      these expressions (including paraphrases), answer with "ANXIETY".
+
+
+      18. "DEPRESSION"
+
+      Answer "DEPRESSION" if the patient thinks depression is a cause. The following
+      (non-exhaustive) list are all expressions of depression: depression, sadness,
+      feeling of absence, emotional detachment, lack of wanting to do things, etc. If
+      the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "DEPRESSION".
       
       
+      19. "MENTAL HEALTH"
+      
+      Answer "MENTAL HEALTH" if the patient thinks mental health issues *other than*
+      anxiety or depression (which are in their own categories above) are a cause. The
+      following (non-exhaustive) list are all expressions of non-anxiety non-depression
+      mental health issues: emotional problems, psychosomatic issues, lack of self
+      control, head disturbed, stress of having new twins, financial difficulties, etc.
+      If the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "MENTAL HEALTH".
+
+
+      20. "MSK ISSUES"
+
+      Answer "MSK ISSUES" if the patient thinks MSK (musculoskeletal) issues are a cause.
+      The following (non-exhaustive) list are all expressions of MSK issues: broken
+      bones, hurting rotator cuff, onset of osteoarthritis, difficulty bending at the
+      knee, hammer toes, cyst on the kneecap, etc. If the patient's response is exactly
+      or similar to these expressions (including paraphrases), answer with "MSK ISSUES".
+      
+      
+      21. "OPHTHALMOLOGY ISSUES"
+
+      Answer "OPHTHALMOLOGY ISSUES" if the patient thinks ophthalmology issues are a
+      cause. The following (non-exhaustive) list are all expressions of ophthalmology
+      issues: loss of left eyesight, blurry eyes, vision problems, delayed vision, etc.
+      If the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "OPHTHALMOLOGY ISSUES".
+      
+
+      22. "RESPIRATORY ISSUES"
+
+      Answer "RESPIRATORY ISSUES" if the patient thinks respiratory issues are a cause.
+      The following (non-exhaustive) list are all expressions of respiratory issues:
+      coughing, dry cough, coughing up blood, rapid breathing, crackling noises when
+      breathing, asthma, bronchitis, copd, pleural effusion, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "RESPIRATORY ISSUES".
+      
+      
+      23. "THERMOREGULATION ISSUES"
+
+      Answer "THERMOREGULATION ISSUES" if the patient thinks thermoregulation issues
+      are a cause. The following (non-exhaustive) list are all expressions of
+      thermoregulation issues: chills, feeling cold, fingers turning blue, poor
+      circulation, cold sweats, night sweats, sweating, feeling hot, burning, hot
+      flashes, flush, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "THERMOREGULATION ISSUES".
+      
+      
+      24. "DERMATOLOGY ISSUES"
+
+      Answer "DERMATOLOGY ISSUES" if the patient thinks dermatology issues are a cause.
+      The following (non-exhaustive) list are all expressions of dermatology issues:
+      rash on the body, itching, skin hanging, skin rolls, right leg got blotchy, skin
+      on leg felt punctured, redness, etc. If the patient's response is exactly or
+      similar to these expressions (including paraphrases), answer with
+      "DERMATOLOGY ISSUES".
+      
+      
+      25. "LIFESTYLE CHOICES"
+
+      Answer "LIFESTYLE CHOICES" if the patient thinks their lifestyle choices are
+      a cause. The following (non-exhaustive) list are all expressions of lifestyle
+      choices: diet, smoking, bad batch of cigarettes, lack of exercise, being
+      overweight, alcohol, eating too much salt, inadequate liquid intake, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "LIFESTYLE CHOICES".
+      
+      
+      26. "MEDICATION RELATED"
+
+      Answer "MEDICATION RELATED" if the patient thinks medication related issues are
+      a cause. The following (non-exhaustive) list are all expressions of medication
+      related issues: blood thinner, antibiotics, medication interaction, medication
+      change, increased dosage of pharmaceuticals, higher dosage of beta blockers,
+      cutting off beta blocker, forgetting to take vitamins, diuretics, new medication,
+      ventolin, neocitran, cold tablets, furosemide, drugs, etc. If the patient's
+      response is exactly or similar to these expressions (including paraphrases),
+      answer with "MEDICATION RELATED".
+      
+      
+      27. "SURGERY COMPLICATION"
+
+      Answer "SURGERY COMPLICATION" if the patient thinks a surgery complication is
+      a cause. The following (non-exhaustive) list are all expressions of surgery
+      complications: open heart surgery complication, healing from surgery, unsuccessful
+      operation, etc. If the patient's response is exactly or similar to these
+      expressions (including paraphrases), answer with "SURGERY COMPLICATION".
+
+
+      28. "OTHER: <symptom/diagnosis>"
+
+      Answer "OTHER: <symptom/diagnosis>" if the patient mentions some other symptom
+      or diagnosis that does not fit in neatly with the above options. Fill in the
+      "<symptom/diagnosis>" tag with a short (1-5 word) descriptive summary of the
+      symptom or diagnosis. If the patient gives more than one symptom or diagnosis
+      that does not fit neatly into the above options, list each answer on a new line,
+      such as:
+      
+      "OTHER: symptom #1
+      
+      OTHER: diagnosis #2"
+
+
+      29. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than a potential cause
+      of their recent hospitalization.
+      
+      
+      30. "UNKNOWN"
+      
+      It is possible that the patient says that they do not know or do not remember a
+      specific cause. In this case, your answer should be a single word: "UNKNOWN".
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I came in to hospital because of
+      shortness of breath and also depression" to:
+
+      "SHORTNESS OF BREATH
+
+      DEPRESSION"
+
+
+      CAUTION: Each individual option *except* "CARDIAC" and "OTHER" should only appear
+      once. The options "IRRELEVANT" and "UNKNOWN" should always appear by themselves.
+      Do not output anything else.
+
+
       NOTE: Be sure to only list the causes the patient suspected in the past,
       not what they currently believe.
-      
-      
-      Output either "IRRELEVANT" or "UNKNOWN" or a comma-separated list of 
-      causes of symptoms. Do not output anything else.
     question_ids: [8a]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN0001, UHN00051, UHN00351]
-    parser_data: {"enum_options": [IRRELEVANT, UNKNOWN]}
+    parser_data:
+      options:
+        - { tag: "SHORTNESS OF BREATH", repeatable: false, value_sep: null }
+        - { tag: "FLUID RETENTION", repeatable: false, value_sep: null }
+        - { tag: "FATIGUE", repeatable: false, value_sep: null }
+        - { tag: "HEART FAILURE", repeatable: false, value_sep: null }
+        - { tag: "DIZZINESS", repeatable: false, value_sep: null }
+        - { tag: "MYOCARDIAL INFARCTION", repeatable: false, value_sep: null }
+        - { tag: "PALPITATIONS", repeatable: false, value_sep: null }
+        - { tag: "BLOOD PRESSURE", repeatable: false, value_sep: null }
+        - { tag: "CARDIAC", repeatable: true, value_sep: ":" }
+        - { tag: "NEUROLOGIC ISSUES", repeatable: false, value_sep: null }
+        - { tag: "INFECTION RELATED", repeatable: false, value_sep: null }
+        - { tag: "ENT ISSUES", repeatable: false, value_sep: null }
+        - { tag: "GI ISSUES", repeatable: false, value_sep: null }
+        - { tag: "UROLOGICAL/GYNECOLOGICAL ISSUES", repeatable: false, value_sep: null }
+        - { tag: "ELECTROLYTE ISSUES", repeatable: false, value_sep: null }
+        - { tag: "ORTHOPNEA", repeatable: false, value_sep: null }
+        - { tag: "ANXIETY", repeatable: false, value_sep: null }
+        - { tag: "DEPRESSION", repeatable: false, value_sep: null }
+        - { tag: "MENTAL HEALTH", repeatable: false, value_sep: null }
+        - { tag: "MSK ISSUES", repeatable: false, value_sep: null }
+        - { tag: "OPHTHALMOLOGY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "RESPIRATORY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "THERMOREGULATION ISSUES", repeatable: false, value_sep: null }
+        - { tag: "DERMATOLOGY ISSUES", repeatable: false, value_sep: null }
+        - { tag: "OTHER", repeatable: true, value_sep: ":" }
+        - { tag: "IRRELEVANT", repeatable: false, value_sep: null }
+        - { tag: "UNKNOWN", repeatable: false, value_sep: null }
   Q_09_tod:
     prompt: >-
       In the snippet below, the interviewer is asking each patient whether they 
@@ -1686,34 +2992,209 @@ clusters:
       In the snippet below, the interviewer is asking each patient if they know
       what their medication is for. For each patient, your task is to extract a
       list of either medication names or the stated purpose of the medication
-      from the patient's response. Format your answer by separating each listed
-      item with a comma ",".
+      from the patient's response into one or more of the following options based
+      on the most appropriate case(s).
       
       
-      NOTE: It is possible that the patient talks about something other than their
-      medications. In this case, your answer should be a single word: "IRRELEVANT".
+      1. "CARDIAC RELATED"
+
+      Answer "CARDIAC RELATED" if the patient mentions a cardiac symptoms or diagnosis
+      that their medication treats, states that their medication is cardiac related, or
+      if they specifically name a cardiac related medication. The following
+      (non-exhaustive) list are all expressions of cardiac related medications,
+      symptoms, or diagnoses: heart failure, weak heart, poor heart function, heart
+      attack, myocardial infarction, palpitations, blood pressure, ipf, heart, heart
+      medication, heart disease, heart problems, heart failure, blood pressure, blood
+      thinners, anticoagulants, hypertension, beta-blockers, arrhythmia, blood flow,
+      afib, reduce heart rate, aneurysm, bypass surgery, inr, angina, valve problems,
+      blood problem, shock treatment, hocom, v-tach, coronary artery disease, aspirin,
+      cholesterol, spironolactone, bisoprolol, metoprolol, amiodarone, rosuvastatin,
+      warfarin, trandolapril, hydralazine hydrochloride, lipitor, diltiazem, eliquis,
+      apixaban, ramipril, atorvastatin, entresto, carvedilol, plavix, altace, digoxin,
+      toloxin, etc. If the patient's response is exactly or similar to these expressions
+      (including paraphrases), answer with "CARDIAC RELATED".
       
       
-      NOTE: If the patient answers in the affirmative, but without expanding further,
+      2. "FLUID RETENTION"
+
+      Answer "FLUID RETENTION" if the patient mentions a fluid retention symptom or
+      diagnosis that their medication treats, states that their medication treats fluid
+      retention, or if they specifically name a fluid retention medication. The following
+      (non-exhaustive) list are all expressions of fluid retention medications, symptoms,
+      or diagnoses: lasix, water pills, kidneys, kidney functions, furosemide, etc. If
+      the patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "FLUID RETENTION".
+      
+      
+      3. "MENTAL HEALTH"
+
+      Answer "MENTAL HEALTH" if the patient mentions a mental health symptom or
+      diagnosis that their medication treats, states that their medication treats
+      mental health, or if they specifically name a mental health medication. The
+      following (non-exhaustive) list are all expressions of mental health medications,
+      symptoms, or diagnoses: anxiety, depression, ptsd, bipolar, schizophrenia, etc.
+      If the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "MENTAL HEALTH".
+      
+      
+      4. "PAIN RELATED"
+
+      Answer "PAIN RELATED" if the patient mentions a pain related symptom or diagnosis
+      that their medication treats, states that their medication treats pain, or if they
+      specifically name a pain related medication (*other than aspirin*). The following
+      (non-exhaustive) list are all expressions of pain related medications, symptoms,
+      or diagnoses: pain, chronic pain, nerve pain, neuropathy, diabetic neuropathy, 
+      fibromyalgia, headaches, tylenol 3, tylenol, advil, naproxen, ibuprofen,
+      methadone, gabapentin, etc. If the patient's response is exactly or similar
+      to these expressions (including paraphrases), answer with "PAIN RELATED".
+      
+
+      5. "GI RELATED"
+      
+      Answer "GI RELATED" if the patient mentions a GI (gastrointestinal) symptom or
+      diagnosis that their medication treats, states that their medication treats a
+      GI related issue, or if they specifically name a GI medication. The following
+      (non-exhaustive) list are all expressions of GI medications, symptoms, or
+      diagnoses: vomiting, nausea, dry mouth, GERD, heart burn, acid reflux, esophagus,
+      indigestion, digestion issues, constipation, diarrhea, stomach, stomach pain,
+      liver, crohn's disease, intestinal pain, controlling bloating, incontinence,
+      gastrointestinal issues, gall stones, etc. If the patient's response is exactly
+      or similar to these expressions (including paraphrases), answer with "GI RELATED".
+
+
+      6. "BONE RELATED"
+
+      Answer "BONE RELATED" if the patient mentions a bone related symptom or diagnosis
+      that their medication treats, states that their medication treats bone issues, or
+      if they specifically name a bone related medication. The following (non-exhaustive)
+      list are all expressions of bone related medications, symptoms, or diagnoses: gout,
+      arthritis, osteoporosis, bone infection, alipurinol, forteo, prolia, etc. If the
+      patient's response is exactly or similar to these expressions (including
+      paraphrases), answer with "BONE RELATED".
+
+
+      7. "RESPIRATORY RELATED"
+
+      Answer "RESPIRATORY RELATED" if the patient mentions a respiratory related symptom
+      or diagnosis that their medication treats, states that their medication treats a
+      respiratory related issue, or if they specifically name a respiratory related
+      medication. The following (non-exhaustive) list are all expressions of respiratory
+      related medications, symptoms, or diagnoses: asthma, lungs, egpa, copd, symbicort,
+      coughing, etc. If the patient's response is exactly or similar to these expressions
+      (including  paraphrases), answer with "RESPIRATORY RELATED".
+      
+      
+      8. "ENDOCRINE RELATED"
+      
+      Answer "ENDOCRINE RELATED" if the patient mentions an endocrine related symptom
+      or diagnosis that their medication treats, states that their medication treats
+      an endocrine related issue, or if they specifically name an endocrine related
+      medication. The following (non-exhaustive) list are all expressions of endocrine
+      related medications, symptoms, or diagnoses: diabetes, islets of langerhans,
+      thyroid, triglycerides, hyperlipidemia, synthroid, trajenta, metformin, etc. If
+      the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "ENDOCRINE RELATED".
+      
+      
+      9. "INFECTIOUS DISEASE RELATED"
+
+      Answer "INFECTIOUS DISEASE RELATED" if the patient mentions an infectious disease
+      related symptom or diagnosis that their medication treats, states that their
+      medication treats an infectious disease related issue, or if they specifically
+      name an infectious disease related medication. The following (non-exhaustive) list
+      are all expressions of infectious disease related medications, symptoms, or
+      diagnoses: anti-shingle, cold sore, sinuses, anti-retroviral, antiviral, hiv,
+      hsv2, verruca, genvoya, antibiotics, etc. If the patient's response is exactly or
+      similar to these expressions (including  paraphrases), answer with "INFECTIOUS
+      DISEASE RELATED".
+        
+
+      10. "CANCER RELATED"
+      
+      Answer "CANCER RELATED" if the patient mentions a caner related symptom or
+      diagnosis that their medication treats, states that their medication treats a
+      cancer related issue, or if they specifically name a cancer related medication.
+      The following (non-exhaustive) list are all expressions of cancer related
+      medications, symptoms, or diagnoses: prostate cancer, blood cancer, lymphoma, etc.
+      If the patient's response is exactly or similar to these expressions (including 
+      paraphrases), answer with "CANCER RELATED".
+      
+      
+      11. "OTHER: <medication/symptom/diagnosis>"
+
+      Answer "OTHER: <medication/symptom/diagnosis>" if the patient mentions some other
+      medication, symptom, or diagnosis that does not fit in neatly with the above
+      options. Fill in the "<medication/symptom/diagnosis>" tag with either the exact
+      medication name, or else a short (1-5 word) descriptive summary of the symptom or
+      diagnosis. If the patient gives more than one medication, symptom, or diagnosis
+      that does not fit neatly into the above options, list each answer on a new line,
+      such as:
+      
+      "OTHER: symptom #1
+      
+      OTHER: diagnosis #2"
+
+
+      12. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than their medications.
+      
+
+      13. "NO DETAIL"
+      
+      If the patient answers in the affirmative, but without expanding further,
       answer with "NO DETAILS". For example, convert the snippet "yes, I do know 
       what they are for" to "NO DETAILS" since the patient provides no details on
       which specific medication they are taking.
       
       
-      NOTE: If the patient answers that they do take medication but that they do
-      *not* know what the medication is for, add "UNKNOWN" to the list. For example,
-      convert the snippet "one medication is for my heart, and I also take one other
-      medication, but I don't know what it's for" to "heart, UNKNOWN".
+      14. "UNKNOWN"
       
+      It is possible that the patient says that they do not know or do not remember
+      what medication they are taking or what it's for. In this case, add "UNKNOWN" to
+      your output list. For example, convert the snippet "one medication is for my
+      heart, and I also take one other medication, but I don't know what it's for" to:
       
-      Output either "IRRELEVANT" or "NO DETAILS" or a comma-separated list of
-      medication names or of the stated purpose of a medication (which can include
-      "UNKNOWN" when the patient does not know the purpose of a medication).
-      Do not output anything else.
+      "CARDIAC RELATED
+
+      UNKNOWN"
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I take medication for acid reflux
+      and also take lasix" to:
+
+      "GI RELATED
+
+      FLUID RETENTION"
+
+
+      CAUTION: Each individual option *except* "OTHER" should only appear once. The
+      options "IRRELEVANT" and "NO DETAIL" should always appear by themselves. Do not
+      output anything else.
     question_ids: [19a]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN0001, UHN00201, UHN00351]
-    parser_data: {"enum_options": ["IRRELEVANT", "NO DETAILS"]}
+    parser_data:
+      options:
+        - { tag: "CARDIAC RELATED", repeatable: false, value_sep: null }
+        - { tag: "FLUID RETENTION", repeatable: false, value_sep: null }
+        - { tag: "MENTAL HEALTH", repeatable: false, value_sep: null }
+        - { tag: "PAIN RELATED", repeatable: false, value_sep: null }
+        - { tag: "GI RELATED", repeatable: false, value_sep: null }
+        - { tag: "BONE RELATED", repeatable: false, value_sep: null }
+        - { tag: "RESPIRATORY RELATED", repeatable: false, value_sep: null }
+        - { tag: "ENDOCRINE RELATED", repeatable: false, value_sep: null }
+        - { tag: "INFECTIOUS DISEASE RELATED", repeatable: false, value_sep: null }
+        - { tag: "CANCER RELATED", repeatable: false, value_sep: null }
+        - { tag: "OTHER", repeatable: true, value_sep: ":" }
+        - { tag: "IRRELEVANT", repeatable: false, value_sep: null }
+        - { tag: "NO DETAIL", repeatable: false, value_sep: null }
+        - { tag: "UNKNOWN", repeatable: false, value_sep: null }
   Q_19b:
     prompt: >-
       In the snippet below, the interviewer is asking each patient whether or 
@@ -1934,20 +3415,138 @@ clusters:
   Q_20:
     prompt: >-
       In the snippet below, the interviewer is asking each patient to provide a 
-      list of what they believe to be the greatest health concerns facing Canadians. 
-      For each patient, your task is to extract a list of health concerns from the 
-      patient's response. Format your answer by separating each listed symptom with 
-      a comma ",". It is possible that the patient talks about something other than 
-      their health concerns facing Canadians. In this case, your answer should be a 
-      single word: "IRRELEVANT".
+      list of what they believe to be the greatest health concerns facing Canadians.       
+      For each patient, your task is to extract a list of health concerns from the
+      patient's response into one or more of the following options based on the most
+      appropriate case(s).
+
+
+      Options:
+
+      1. "CANCER"
+
+      Answer "CANCER" if the patient thinks cancer or a cancer-related issue is the
+      greatest Canadian health concern.
+
+
+      2. "OBESITY"
+      
+      Answer "OBESITY" if the patient thinks obesity or an obesity-related issue is the
+      greatest Canadian health concern.
       
       
-      Output either "IRRELEVANT" or a comma-separated list of health concerns 
-      facing Canadians. Do not output anything else.
+      3. "STROKE"
+
+      Answer "STROKE" if the patient thinks stroke or a stroke-related issue is the
+      greatest Canadian health concern.
+      
+      
+      4. "COVID"
+
+      Answer "COVID" if the patient thinks COVID-19 or a related issue (including
+      mentions of "the pandemic") is the greatest Canadian health concern.
+      
+      
+      5. "DIABETES"
+
+      Answer "DIABETES" if the patient thinks diabetes or a diabetes-related issue is
+      the greatest Canadian health concern.
+
+
+      6. "DRUGS ALCOHOL SMOKING"
+      
+      Answer "DRUGS ALCOHOL SMOKING" if the patient thinks any or all of drugs, alcohol,
+      smoking, or vaping (or a related issue) are the greatest Canadian health concern.
+      
+      
+      7. "MENTAL HEALTH"
+
+      Answer "MENTAL HEALTH" if the patient thinks mental health issues (including, but
+      not limited to: depression, stress, anxiety, etc) are the greatest Canadian health
+      concern.
+      
+      
+      8. "DEMENTIA"
+
+      Answer "DEMENTIA" if the patient thinks dementia or a dementia-related issue
+      (including, but not limited to, alzheimer's) is the greatest Canadian health
+      concern.
+      
+      
+      9. "CARDIAC"
+
+      Answer "CARDIAC" if the patient thinks cardiac or a cardiac-related issue
+      (including, but not limited to: heart disease, heart failure, heart attack,
+      high blood pressure, etc) is the greatest Canadian health concern.
+
+
+      10. "LIFESTYLE"
+
+      Answer "LIFESTYLE" if the patient thinks lifestyle or a lifestyle-related issue
+      (including, but not limited to: lack of exercise, nutrition, diet, salt, etc) is
+      the greatest Canadian health concern.
+
+
+      11. "SYSTEMIC PROBLEMS"
+
+      Answer "SYSTEMIC PROBLEMS" if the patient thinks system problems (including, but
+      not limited to: delayed diagnosis, accessibility, accessing health care services,
+      wait times, lack of funding, red tape, policies and procedure, communication, etc)
+      are the greatest Canadian health concern.
+
+      
+      12. "OTHER: <concern>"
+
+      Answer "OTHER: <concern>" if the patient mentions some other concern that does not
+      fit in neatly with the above options. For example, fear, denial, climate change,
+      or an aging population. Fill in the "<concern>" tag with a short (1-5 word)
+      descriptive summary of the expressed concern. If the patient gives more than one
+      concern that does not fit neatly into the above options, list each answer on a new
+      line, such as:
+      
+      "OTHER: concern #1
+      
+      OTHER: concern #2"      
+      
+      
+      13. "IRRELEVANT"
+
+      Answer with "IRRELEVANT" if the patient fails to answer the interviewer's 
+      question because they are talking about something other than what they believe
+      to be the greatest health concern facing Canadians.
+
+
+      Additional instructions:
+
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option on
+      a new line. For example, convert the snippet "I think it's cancer and obesity" to:
+
+      "CANCER
+
+      OBESITY"
+
+
+      CAUTION: Each individual option *except* "OTHER" should only appear once. The
+      options "IRRELEVANT" should always appear by itself. Do not output anything else.
     question_ids: [20]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN00201, UHN0001, UHN00251, UHN00301]
-    parser_data: {"enum_options": [IRRELEVANT]}
+    parser_data:
+      options:
+        - { tag: "CANCER", repeatable: false, value_sep: null }
+        - { tag: "OBESITY", repeatable: false, value_sep: null }
+        - { tag: "STROKE", repeatable: false, value_sep: null }
+        - { tag: "COVID", repeatable: false, value_sep: null }
+        - { tag: "DIABETES", repeatable: false, value_sep: null }
+        - { tag: "DRUGS ALCOHOL SMOKING", repeatable: false, value_sep: null }
+        - { tag: "MENTAL HEALTH", repeatable: false, value_sep: null }
+        - { tag: "DEMENTIA", repeatable: false, value_sep: null }
+        - { tag: "CARDIAC", repeatable: false, value_sep: null }
+        - { tag: "LIFESTYLE", repeatable: false, value_sep: null }
+        - { tag: "SYSTEMIC PROBLEMS", repeatable: false, value_sep: null }
+        - { tag: "OTHER", repeatable: true, value_sep: ":" }
+        - { tag: "IRRELEVANT", repeatable: false, value_sep: null }
   Q_21_htn:
     prompt: >-
       In the snippet below, the interviewer is asking each patient whether they
@@ -2605,6 +4204,30 @@ clusters:
       of their occupation (either current or past if they are retired). For each
       patient, your task is to extract a list of occupations from the patient's
       response. Format your answer by separating each listed item with a comma: ",".
+
+      
+      Classify each occupation rather than verbatim copying the patient's answer. Here
+      are some suggested classification categories:
+      
+      - BUSINESS (owner, entrepreneur, sales, marketing, advertising, finance, etc.)
+      
+      - TRADES (construction, electrician, plumber, etc)
+      
+      - PROFESSION (lawyer, nurse, doctor, accountant, engineer, banking, it, etc)
+      
+      - ARTS (musician, artist, singer, photographer, author, etc)
+      
+      - BLUE COLLAR (factory worker, mechanic, welder, etc)
+      
+      - WHITE COLLAR (secretary, analyst, realtor, etc)
+      
+      - SERVICES (cashier, waiter, cosmetician, catering, etc)
+      
+      - EDUCATION (childcare, teacher, principal, etc)
+
+
+      NOTE: These categories are merely suggestions. Feel free to add new categories or
+      to modify these ones as you see fit.
       
       
       NOTE: It is possible that the patient talks about something other than their
@@ -2625,10 +4248,36 @@ clusters:
   Q_26a:
     prompt: >-
       In the snippet below, the interviewer is asking each patient to provide a
-      list of their past occupation (if any) in their previous country or in
-      their country of origin. For each patient, your task is to extract a list
+      list of their past occupation (if any) in their *previous country or in
+      their country of origin*. For each patient, your task is to extract a list
       of occupations from the patient's response. Format your answer by separating
       each listed item with a comma: ",".
+
+
+      Classify each occupation rather than verbatim copying the patient's answer. Here
+      are some suggested classification categories:
+      
+      - BUSINESS (owner, entrepreneur, sales, marketing, advertising, finance, etc.)
+      
+      - TRADES (construction, electrician, plumber, etc)
+      
+      - PROFESSION (lawyer, nurse, doctor, accountant, engineer, banking, it, etc)
+      
+      - ARTS (musician, artist, singer, photographer, author, etc)
+      
+      - BLUE COLLAR (factory worker, mechanic, welder, etc)
+      
+      - WHITE COLLAR (secretary, analyst, realtor, etc)
+      
+      - SERVICES (cashier, waiter, cosmetician, catering, etc)
+      
+      - EDUCATION (childcare, teacher, principal, etc)
+      
+      - MILITARY (soldier, officer, etc)
+
+
+      NOTE: These categories are merely suggestions. Feel free to add new categories or
+      to modify these ones as you see fit.
       
       
       NOTE: It is possible that the patient talks about something other than their
