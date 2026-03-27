@@ -11,6 +11,15 @@ def re_compile(pattern: str, flags=None) -> re.Pattern:
     return re.compile(pattern) if flags is None else re.compile(pattern, flags=flags)
 
 
+DEFAULT_CLEANUP_SEPS: str = "*(["
+
+
+def _cleanup(s: str, seps: str) -> str:
+    for char in seps:
+        s = s.split(char)[0]
+    return s
+
+
 class OutputParser:
     def __init__(self, *args, **kwargs):
         pass
@@ -87,17 +96,18 @@ class EnumParser(OutputParser):
     def __init__(self, options: Type[EnumSubType]):
         """
         Returns the Enum option that the generated_text matches exactly
-        (barring whitespace) or None if the text is not an exact match.
+        (up to the first whitespace) or None if the text is not an exact match.
         """
         super().__init__()
         self.options = options
 
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[EnumSubType]:
+        first_word = generated_text.split()[0]
         try:
-            return enum_from_str(self.options, generated_text.strip())
+            return enum_from_str(self.options, first_word)
         except ValueError:
             for option in self.options:
-                if option.value.upper() == generated_text.strip().upper():
+                if option.value.upper() == first_word.upper():
                     return option
             return None
 
@@ -141,7 +151,13 @@ class Tag:
 
 
 class TagParser(OutputParser):
-    def __init__(self, tag: str, value_sep: Optional[str] = None, flags=re.IGNORECASE):
+    def __init__(
+        self,
+        tag: str,
+        value_sep: Optional[str] = None,
+        cleanup: str = DEFAULT_CLEANUP_SEPS,
+        flags=re.IGNORECASE,
+    ):
         """
         Parses LLM output based on Tag data. Returns a Tag or None on failure.
 
@@ -149,11 +165,14 @@ class TagParser(OutputParser):
         :param value_sep: If given, the tag is assumed to take a mandatory value,
             where 'value_sep' is the separator between the tag name and said value.
             If None, the tag is assumed to never take any value.
+        :param cleanup: If 'value_sep' is not None, if 'cleanup' is not empty, clean up
+            each resulting value by removing string after *any* character in 'cleanup'.
         :param flags: Flags to pass to re.search(), if any.
         """
         super().__init__()
         self.tag_parser = RegexExtractionParser(tag, match_group=0, flags=flags)
         self.value_sep = value_sep
+        self.cleanup = cleanup
 
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[Tag]:
         maybe_tag, value = generated_text, None
@@ -161,7 +180,7 @@ class TagParser(OutputParser):
             split = generated_text.split(self.value_sep)
             if len(split) != 2:
                 return None
-            maybe_tag, value = split[0], split[1].strip()
+            maybe_tag, value = split[0], _cleanup(split[1], self.cleanup).strip()
         result = self.tag_parser(maybe_tag, *args, **kwargs)
         if result is None:
             return None
@@ -206,30 +225,47 @@ class JSONParser(StringOutputParser):
 class FloatMatchParser(ScoreOutputParser):
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[float]:
         """
-        Returns the exactly matching number in the generated_text (barring whitespace)
-        as a score or None if the text is not an exact match for a number.
+        Returns the exactly matching number in the generated_text (up to the first
+        whitespace) as a score or None if the text is not an exact match for a number.
         """
         try:
-            return float(generated_text.strip())
+            return float(generated_text.split()[0])
         except ValueError:
             return None
 
 
 class ListOfStringsParser(OutputParser):
-    def __init__(self, sep: str = ",", strip: bool = True):
+    def __init__(
+        self,
+        sep: str = ",",
+        strip: bool = True,
+        cleanup: str = DEFAULT_CLEANUP_SEPS,
+    ):
         """
         Uses 'sep' to split the generated_text into a list of strings.
 
         :param sep: The string seperator to use.
-        :param strip: Whether to remove whitespace from each string item.
+        :param strip: Whether to remove whitespace from each string item. If 'cleanup'
+            is not empty, stripping is done after clean up.
+        :param cleanup: After splitting the string using 'sep', if not empty, clean up
+            each resulting item by removing string after *any* character in 'cleanup'.
+
+        NOTE: Typically, sep="," or sep="\n" and cleanup="*([" (to remove parenthetical
+        information). However, in a string like:
+            "item1 (parenthetical, with comma), item2, item3"
+        because this implementation first applies 'sep' and then 'cleanup', the result
+        (assuming strip=True) becomes:
+            ["item1", "with comma)", "item2", "item3"]
+        which is not the intended outcome. This is a limitation of this implementation.
         """
         super().__init__()
         self.sep = sep
         self.strip = strip
+        self.cleanup = cleanup
 
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[list[str]]:
         """Returns a list of strings, or None if the list is empty."""
-        items = generated_text.split(self.sep)
+        items = [_cleanup(i, self.cleanup) for i in generated_text.split(self.sep)]
         if self.strip:
             return [item.strip() for item in items]
         return items or None

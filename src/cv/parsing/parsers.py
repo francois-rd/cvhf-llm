@@ -11,6 +11,7 @@ from .base import (
     RegexMatchParser,
     Tag,
     TagParser,
+    DEFAULT_CLEANUP_SEPS,
 )
 
 
@@ -31,6 +32,7 @@ class ListOrEnumParser(OutputParser):
         enum_options: list[str] = None,
         sep: str = ",",
         strip: bool = True,
+        cleanup: str = DEFAULT_CLEANUP_SEPS,
     ):
         """
         Parses the LLM output along one of two primary options:
@@ -42,13 +44,16 @@ class ListOrEnumParser(OutputParser):
             'sep' represents the string separator between string items.
         :param strip: If the LLM is outputting a list of strings instead of an Enum,
             whether to str.strip() each list item before returning.
+        :param cleanup: If the LLM is outputting a list of strings instead of an Enum,
+            after splitting the string using 'sep', if 'cleanup' is not empty, clean up
+            each resulting item by removing string after *any* character in 'cleanup'.
         """
         super().__init__()
         if enum_options is None:
             self.enum_parser = None
         else:
             self.enum_parser = EnumParser.from_options(enum_options)
-        self.list_parser = ListOfStringsParser(sep=sep, strip=strip)
+        self.list_parser = ListOfStringsParser(sep=sep, strip=strip, cleanup=cleanup)
 
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[ListOrEnum]:
         """Returns a ListOrEnum or None if neither option can be parsed."""
@@ -75,7 +80,8 @@ class ListOfEnumsParser(OutputParser):
         """
         super().__init__()
         self.enum_parser = EnumParser.from_options(enum_options)
-        self.list_parser = ListOfStringsParser(sep=sep)
+        # EnumParser does its own form of cleanup, so no explicit cleanup needed.
+        self.list_parser = ListOfStringsParser(sep=sep, cleanup="")
 
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[list[str]]:
         result = self.list_parser(generated_text, *args, **kwargs)
@@ -368,6 +374,7 @@ class MultiTagParser(OutputParser):
         self,
         options: list[TagData],
         sep: Optional[str] = default_sep,
+        cleanup: str = DEFAULT_CLEANUP_SEPS,
     ):
         """
         Parses the LLM output according to a set of TagParsers instantiated from
@@ -377,11 +384,18 @@ class MultiTagParser(OutputParser):
         :param sep: If not None, the LLM output is split according to this separator.
             Each resulting split must contain exactly one valid tag. If None, the
             entire LLM output must consist of exactly one valid tag.
+        :param cleanup: For each TagData in 'options' where the 'value_sep' is not None,
+            if 'cleanup' is not empty, clean up each resulting value by removing
+            string after *any* character in 'cleanup'.
+
+        NOTE: Because this implementation first applies 'sep' and then 'cleanup' (if
+        any), the resulting string splits might not follow the intended outcome. This
+        is a limitation of this implementation.
         """
         super().__init__()
         self.tags = {tag.tag: tag for tag in options}
         self.sep = sep
-        self.parsers = [TagParser(tag.tag, tag.value_sep) for tag in options]
+        self.parsers = [TagParser(tag.tag, tag.value_sep, cleanup) for tag in options]
 
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[list[Tag]]:
         """
@@ -441,12 +455,14 @@ class MultiTagParser(OutputParser):
     def from_tag_data(cls, **kwargs) -> "MultiTagParser":
         try:
             tag_data = kwargs["options"]
+            tags = [TagData(**data) for data in tag_data]
         except KeyError:
             raise ValueError(
                 f"{cls.__name__}: To instantiate from tag data, the input dictionary "
                 f"must adhere to the following schema:\n"
                 "{\n"
-                '   "separator": <string>,  # This field is optional. '
+                '   "sep": <string>,  # This field is optional. '
+                '   "cleanup": <string>,  # This field is optional. '
                 "Newline is used by default.\n"
                 '   "options": [\n'
                 "       {\n"
@@ -458,9 +474,9 @@ class MultiTagParser(OutputParser):
                 "   ]\n"
                 "}"
             )
-        sep = kwargs.get("separator", cls.default_sep)
-        tags = [TagData(**data) for data in tag_data]
-        return MultiTagParser(options=tags, sep=sep)
+        sep = kwargs.get("sep", cls.default_sep)
+        cleanup = kwargs.get("cleanup", DEFAULT_CLEANUP_SEPS)
+        return MultiTagParser(options=tags, sep=sep, cleanup=cleanup)
 
 
 @dataclass
