@@ -4202,99 +4202,196 @@ clusters:
     prompt: >-
       In the snippet below, the interviewer is asking each patient to provide a list
       of their occupation (either current or past if they are retired). For each
-      patient, your task is to extract a list of occupations from the patient's
-      response. Format your answer by separating each listed item with a comma: ",".
+      patient, your task is to extract and categorize a set of occupations from the
+      patient's response.
+
+
+      Classify each occupation rather than verbatim copying the patient's answer. Here
+      are the classification categories you must use, along with a few key examples for
+      each:
 
       
-      Classify each occupation rather than verbatim copying the patient's answer. Here
-      are some suggested classification categories:
+      - BUSINESS (owner, entrepreneur, manager, operations, leadership, sales,
+      marketing, advertising, etc)
       
-      - BUSINESS (owner, entrepreneur, sales, marketing, advertising, finance, etc.)
+      - FINANCE (financial analyst, banking, insurance, accountant, etc)
       
-      - TRADES (construction, electrician, plumber, etc)
+      - TRADES (construction, electrician, plumber, mechanic, etc)
       
-      - PROFESSION (lawyer, nurse, doctor, accountant, engineer, banking, it, etc)
+      - HEALTHCARE (nurse, doctor, surgeon, healthcare worker, social work, etc)
+      
+      - PROFESSION (lawyer, paralegal, engineer, IT/technology, bookkeeping, etc)
       
       - ARTS (musician, artist, singer, photographer, author, etc)
       
-      - BLUE COLLAR (factory worker, mechanic, welder, etc)
+      - BLUE_COLLAR (factory worker, welder, transportation, agriculture, etc)
       
-      - WHITE COLLAR (secretary, analyst, realtor, etc)
+      - WHITE_COLLAR (secretary/receptionist, realtor, researcher, etc)
       
-      - SERVICES (cashier, waiter, cosmetician, catering, etc)
+      - SERVICES (cashier, waiter, cosmetician, catering, delivery/courier, homemaker,
+      baker, grocer, butcher, hospitality, restaurant, hotel, chef, retail, gaming,
+      telecommunications, etc)
       
       - EDUCATION (childcare, teacher, principal, etc)
-
-
-      NOTE: These categories are merely suggestions. Feel free to add new categories or
-      to modify these ones as you see fit.
       
+      - SECURITY (soldier, military officer, police, law enforcement, security guard, etc)
+      
+      - GOVERNMENT (specifically, non-education parts of the civilian government, such
+      as government office job, politician, public service worker, etc)
+
+      - NONPROFIT (labor, union, non-profit/NGO, volunteer, etc)
+      
+      - OTHER (anything not clearly fitting in any of the above categories)
+      
+      
+      Additional instructions:
+
+      For each of the above options, add a 1-3 word description of the occupation
+      following the category tag. Separate the two with a ":". For example, convert
+      the snippet "I work in sales" to "BUSINESS: sales" because (per the above
+      description), 'sales' falls under the BUSINESS category. More generally, use the
+      format "<CATEGORY>: <description>" for each category option listed above. Use
+      your best judgement for classifying occupation that are not explicitly mentioned
+      in the above examples for each category.
+      
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option *on a
+      new line*. For example, convert the snippet "I've been a cashier and a waiter" to:
+
+      "SERVICES: cashier
+
+      SERVICES: waiter"
+
       
       NOTE: It is possible that the patient talks about something other than their
       occupation(s). In this case, your answer should be a single word: "IRRELEVANT".
       
       
-      NOTE: It is possible that the patient expresses that they never had an
-      occupation (neither currently nor in the past). In this case, your answer
-      should be a single word: "NONE".
+      NOTE: It is possible that the patient expresses that they never had an occupation
+      (neither currently nor in the past). In this case, your answer should be a single
+      word: "NONE".
       
       
-      Output either "IRRELEVANT" or "NONE" or a comma-separated list of occupations.
+      CAUTION: The options "IRRELEVANT" and "NONE" should always appear by themselves.
       Do not output anything else.
     question_ids: [26]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN0001, UHN00051, UHN00101, UHN00251]
-    parser_data: {"enum_options": [IRRELEVANT, NONE]}
+    parser_data:
+      options:
+        - { tag: "BUSINESS", repeatable: true, value_sep: ":" }
+        - { tag: "FINANCE", repeatable: true, value_sep: ":" }
+        - { tag: "TRADES", repeatable: true, value_sep: ":" }
+        - { tag: "HEALTHCARE", repeatable: true, value_sep: ":" }
+        - { tag: "PROFESSION", repeatable: true, value_sep: ":" }
+        - { tag: "ARTS", repeatable: true, value_sep: ":" }
+        - { tag: "BLUE_COLLAR", repeatable: true, value_sep: ":" }
+        - { tag: "WHITE_COLLAR", repeatable: true, value_sep: ":" }
+        - { tag: "SERVICES", repeatable: true, value_sep: ":" }
+        - { tag: "EDUCATION", repeatable: true, value_sep: ":" }
+        - { tag: "SECURITY", repeatable: true, value_sep: ":" }
+        - { tag: "GOVERNMENT", repeatable: true, value_sep: ":" }
+        - { tag: "NONPROFIT", repeatable: true, value_sep: ":" }
+        - { tag: "OTHER", repeatable: true, value_sep: ":" }
+        - { tag: "NONE", repeatable: false, value_sep: null }
+        - { tag: "IRRELEVANT", repeatable: false, value_sep: null }
   Q_26a:
     prompt: >-
       In the snippet below, the interviewer is asking each patient to provide a
-      list of their past occupation (if any) in their *previous country or in
-      their country of origin*. For each patient, your task is to extract a list
-      of occupations from the patient's response. Format your answer by separating
-      each listed item with a comma: ",".
+      list of their past occupation (if any) in their *previous country or in their
+      country of origin*. For each patient, your task is to extract and categorize
+      a set of occupations from the patient's response.
 
 
       Classify each occupation rather than verbatim copying the patient's answer. Here
-      are some suggested classification categories:
+      are the classification categories you must use, along with a few key examples for
+      each:
+
       
-      - BUSINESS (owner, entrepreneur, sales, marketing, advertising, finance, etc.)
+      - BUSINESS (owner, entrepreneur, manager, operations, leadership, sales,
+      marketing, advertising, etc)
       
-      - TRADES (construction, electrician, plumber, etc)
+      - FINANCE (financial analyst, banking, insurance, accountant, etc)
       
-      - PROFESSION (lawyer, nurse, doctor, accountant, engineer, banking, it, etc)
+      - TRADES (construction, electrician, plumber, mechanic, etc)
+      
+      - HEALTHCARE (nurse, doctor, surgeon, healthcare worker, social work, etc)
+      
+      - PROFESSION (lawyer, paralegal, engineer, IT/technology, bookkeeping, etc)
       
       - ARTS (musician, artist, singer, photographer, author, etc)
       
-      - BLUE COLLAR (factory worker, mechanic, welder, etc)
+      - BLUE_COLLAR (factory worker, welder, transportation, agriculture, etc)
       
-      - WHITE COLLAR (secretary, analyst, realtor, etc)
+      - WHITE_COLLAR (secretary/receptionist, realtor, researcher, etc)
       
-      - SERVICES (cashier, waiter, cosmetician, catering, etc)
+      - SERVICES (cashier, waiter, cosmetician, catering, delivery/courier, homemaker,
+      baker, grocer, butcher, hospitality, restaurant, hotel, chef, retail, gaming,
+      telecommunications, etc)
       
       - EDUCATION (childcare, teacher, principal, etc)
       
-      - MILITARY (soldier, officer, etc)
-
-
-      NOTE: These categories are merely suggestions. Feel free to add new categories or
-      to modify these ones as you see fit.
+      - SECURITY (soldier, military officer, police, law enforcement, security guard, etc)
       
+      - GOVERNMENT (specifically, non-education parts of the civilian government, such
+      as government office job, politician, public service worker, etc)
+
+      - NONPROFIT (labor, union, non-profit/NGO, volunteer, etc)
+      
+      - OTHER (anything not clearly fitting in any of the above categories)
+      
+      
+      Additional instructions:
+
+      For each of the above options, add a 1-3 word description of the occupation
+      following the category tag. Separate the two with a ":". For example, convert
+      the snippet "I work in sales" to "BUSINESS: sales" because (per the above
+      description), 'sales' falls under the BUSINESS category. More generally, use the
+      format "<CATEGORY>: <description>" for each category option listed above. Use
+      your best judgement for classifying occupations that are not explicitly mentioned
+      in the above examples for each category.
+      
+      
+      Answer with any of the options listed above that are appropriate. If more than
+      one option is appropriate at the same time, list each appropriate option *on a
+      new line*. For example, convert the snippet "I've been a cashier and a waiter" to:
+
+      "SERVICES: cashier
+
+      SERVICES: waiter"
+
       
       NOTE: It is possible that the patient talks about something other than their
       occupation(s). In this case, your answer should be a single word: "IRRELEVANT".
       
       
-      NOTE: It is possible that the patient expresses that they never had an
-      occupation in their previous country or country of origin. In this case,
-      your answer should be a single word: "NONE".
+      NOTE: It is possible that the patient expresses that they never had an occupation
+      in their previous country or country of origin. In this case, your answer should
+      be a single word: "NONE".
       
       
-      Output either "IRRELEVANT" or "NONE" or a comma-separated list of occupations.
+      CAUTION: The options "IRRELEVANT" and "NONE" should always appear by themselves.
       Do not output anything else.
     question_ids: [26a]
-    parser_type: LIST_OR_ENUM
+    parser_type: MULTI_TAG
     few_shot_assign_ids: [UHN0001, UHN00151, UHN00201, UHN00351]
-    parser_data: {"enum_options": [IRRELEVANT, NONE]}
+    parser_data:
+      options:
+        - { tag: "BUSINESS", repeatable: true, value_sep: ":" }
+        - { tag: "FINANCE", repeatable: true, value_sep: ":" }
+        - { tag: "TRADES", repeatable: true, value_sep: ":" }
+        - { tag: "HEALTHCARE", repeatable: true, value_sep: ":" }
+        - { tag: "PROFESSION", repeatable: true, value_sep: ":" }
+        - { tag: "ARTS", repeatable: true, value_sep: ":" }
+        - { tag: "BLUE_COLLAR", repeatable: true, value_sep: ":" }
+        - { tag: "WHITE_COLLAR", repeatable: true, value_sep: ":" }
+        - { tag: "SERVICES", repeatable: true, value_sep: ":" }
+        - { tag: "EDUCATION", repeatable: true, value_sep: ":" }
+        - { tag: "SECURITY", repeatable: true, value_sep: ":" }
+        - { tag: "GOVERNMENT", repeatable: true, value_sep: ":" }
+        - { tag: "NONPROFIT", repeatable: true, value_sep: ":" }
+        - { tag: "NONE", repeatable: false, value_sep: null }
+        - { tag: "IRRELEVANT", repeatable: false, value_sep: null }
   Q_27:
     prompt: >-
       In the snippet below, the interviewer is asking each patient what their
