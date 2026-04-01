@@ -16,7 +16,7 @@ DEFAULT_CLEANUP_SEPS: str = "*(["
 
 def _cleanup(s: str, seps: str) -> str:
     for char in seps:
-        s = s.split(char)[0]
+        s = (s.split(char) or [""])[0]
     return s
 
 
@@ -102,7 +102,7 @@ class EnumParser(OutputParser):
         self.options = options
 
     def __call__(self, generated_text: str, *args, **kwargs) -> Optional[EnumSubType]:
-        first_word = generated_text.split()[0]
+        first_word = (generated_text.split() or [""])[0]
         try:
             return enum_from_str(self.options, first_word)
         except ValueError:
@@ -229,7 +229,7 @@ class FloatMatchParser(ScoreOutputParser):
         whitespace) as a score or None if the text is not an exact match for a number.
         """
         try:
-            return float(generated_text.split()[0])
+            return float((generated_text.split() or [""])[0])
         except ValueError:
             return None
 
