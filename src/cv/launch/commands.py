@@ -36,6 +36,7 @@ from ..io import (
     walk_docx,
     walk_files,
     walk_json,
+    scrub,
 )
 from ..validation import (
     ComparisonAggregator,
@@ -62,6 +63,20 @@ def segment(paths: PathConfig, tags: TagsConfig, clusters: ClustersConfig):
         transcript = to_transcript(lines, tag(lines))
         output_file = walk.map(paths.clustered_transcript_dir)
         save_dataclass_json(output_file, transcript, indent=4)
+
+
+def q19_to_csv(paths: PathConfig, clusters: ClustersConfig):
+    data, root = {}, paths.clustered_transcript_dir
+    cluster_names = [c for c in clusters.clusters if c.startswith("Q_19")]
+    for transcript, walk in walk_dataclass_json(root, t=Transcript):
+        data.setdefault("assign_id", []).append(walk.no_ext())
+        for name in cluster_names:
+            cluster = transcript.clusters[name]
+            if cluster is None:
+                data.setdefault(name, []).append("N/A")
+            else:
+                data.setdefault(name, []).append(scrub("\n".join(cluster.lines)))
+    pd.DataFrame(data).to_csv(paths.q19_transcript_file, index=False)
 
 
 class RerunProtocol(Enum):
@@ -229,6 +244,7 @@ def register():
         segment,
         **Cfgs.add(Cfgs.paths, Cfgs.tags, Cfgs.clusters),
     )
+    coma.register("q19.to.csv", q19_to_csv, Cfgs.paths, Cfgs.clusters)
 
     @coma.hooks.hook
     def extract_pre_config_hook(known_args, unknown_args, configs):

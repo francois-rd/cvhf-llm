@@ -27,6 +27,7 @@ docx.to.json
 extract
 mini.validation
 parse.labels
+q19.to.csv
 segment
 test.comp
 test.launch

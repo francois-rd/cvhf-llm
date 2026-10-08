@@ -38,6 +38,9 @@ class PathConfig:
     # Folder containing a manually-labeled subset of transcripts.
     labeled_transcript_dir: str = "${transcript_dir}/labeled"
 
+    # File that contains the Q19 subset of the transcripts.
+    q19_transcript_file: str = "${transcript_dir}/q19.csv"
+
     # Results (from LLMs and evaluation).
     results_dir: str = "${root_dir}/results"
 
